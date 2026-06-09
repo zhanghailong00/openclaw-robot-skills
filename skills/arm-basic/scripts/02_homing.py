@@ -1,6 +1,19 @@
 #!/usr/bin/env python3
-"""归零复位：移动到初始位姿 (150, 0, 50)mm。"""
+"""
+机械臂归零复位
+
+功能：将机械臂移动到安全初始位姿 (150, 0, 50)mm
+硬件：4-DOF 机械臂（UART 串口，/dev/ttyUSB1）
+说明：归零后机械臂处于安全位置，可用于后续操作的起点
+
+用法：
+  python3 02_homing.py
+
+输出：纯文本
+"""
 import sys
+
+# 加载机械臂 SDK
 sys.path.insert(0, "/home/HwHiAiUser/arm_voice_soft")
 sys.path.insert(0, "/home/HwHiAiUser/arm_voice_soft/utils_arm")
 

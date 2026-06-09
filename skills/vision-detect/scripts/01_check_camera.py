@@ -1,6 +1,19 @@
 #!/usr/bin/env python3
-"""测试摄像头 + 去畸变。"""
+"""
+摄像头检测脚本
+
+功能：测试摄像头是否正常工作，验证拍照和去畸变功能
+硬件：UVC 摄像头（/dev/video2），640x480 分辨率
+原理：读取一帧图像 → cv2.remap 去畸变 → 检查结果
+
+用法：
+  python3 01_check_camera.py
+
+输出：纯文本
+"""
 import sys
+
+# 加载摄像头 SDK
 sys.path.insert(0, "/home/HwHiAiUser/arm_voice_soft")
 sys.path.insert(0, "/home/HwHiAiUser/arm_voice_soft/camera_utils")
 

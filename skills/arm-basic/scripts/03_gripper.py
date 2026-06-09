@@ -1,12 +1,21 @@
 #!/usr/bin/env python3
-"""夹爪控制：支持 open/close 参数，也支持无参数测试模式。
+"""
+夹爪控制脚本
+
+功能：控制机械臂末端夹爪的开合
+硬件：4-DOF 机械臂上的夹爪舵机（ID=4，UART 串口通信）
+原理：通过舵机角度控制夹爪开合，45°=打开，0°=闭合
 
 用法：
   python3 03_gripper.py --action open      # 只打开
   python3 03_gripper.py --action close     # 只闭合
   python3 03_gripper.py                    # 测试模式（开→闭）
+
+输出：JSON 格式（--action 模式）或纯文本（测试模式）
 """
 import sys, json, argparse
+
+# 加载机械臂 SDK
 sys.path.insert(0, "/home/HwHiAiUser/arm_voice_soft")
 sys.path.insert(0, "/home/HwHiAiUser/arm_voice_soft/utils_arm")
 

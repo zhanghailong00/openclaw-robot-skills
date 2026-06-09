@@ -1,6 +1,19 @@
 #!/usr/bin/env python3
-"""读取机械臂状态 — 只读，安全。"""
+"""
+读取机械臂状态（只读，安全）
+
+功能：查询 4-DOF 机械臂当前的关节角度和末端坐标
+硬件：4-DOF 机械臂（UART 串口，/dev/ttyUSB1）
+说明：此脚本不控制机械臂，只读取状态，用于确认通信正常
+
+用法：
+  python3 01_status.py
+
+输出：纯文本
+"""
 import sys
+
+# 加载机械臂 SDK
 sys.path.insert(0, "/home/HwHiAiUser/arm_voice_soft")
 sys.path.insert(0, "/home/HwHiAiUser/arm_voice_soft/utils_arm")
 

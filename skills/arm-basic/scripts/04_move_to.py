@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""移动机械臂末端到指定坐标。
+"""
+移动机械臂末端到指定坐标
+
+功能：控制 4-DOF 机械臂末端移动到指定的 (x, y, z) 坐标
+硬件：4-DOF 机械臂（UART 串口舵机，/dev/ttyUSB1）
+原理：逆运动学解算 → 最小抖动轨迹规划 → 舵机控制
 
 用法：
   python3 04_move_to.py --x 150 --y 50 --z 80
@@ -11,10 +16,11 @@
   --z Z    Z 坐标 (mm)，必填
   --t T    运动时间 (s)，默认 0.75，越小越快
 
-输出 JSON：
-  {"success": true, "target": {"x": 150, "y": 50, "z": 80}, "actual": {"x": 150.1, "y": 49.8, "z": 80.2}}
+输出：JSON 格式
 """
 import sys, json, argparse
+
+# 加载机械臂 SDK（arm4dof.py + 运动学模块）
 sys.path.insert(0, "/home/HwHiAiUser/arm_voice_soft")
 sys.path.insert(0, "/home/HwHiAiUser/arm_voice_soft/utils_arm")
 

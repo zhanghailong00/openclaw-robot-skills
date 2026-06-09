@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """
-像素坐标 -> 工作台坐标 -> 机械臂坐标 转换
+坐标转换脚本
+
+功能：将像素坐标转换为机械臂可用的坐标
+硬件：UVC 摄像头 + 4-DOF 机械臂
+原理：像素 → 仿射变换 → 工作台坐标 → 齐次变换 → 机械臂坐标（含 Z 校正）
 
 用法：
   python3 02_convert.py --px 320 --py 240
-  python3 02_convert.py --cx 321 --cy 93 --width 116 --height 111
+  python3 02_convert.py --px 320 --py 240 --json
+
+输出：JSON 格式（加 --json）或纯文本
 """
 import sys, os, argparse, json
 
