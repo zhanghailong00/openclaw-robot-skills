@@ -1,0 +1,118 @@
+========================================
+  OpenClaw 飞书控制机械臂 启动指南
+  设备：OrangePi AIpro 20T (RK3588)
+========================================
+
+一、从零到一（首次部署）
+------------------------
+
+1. 安装 Node.js
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+   source ~/.bashrc
+   nvm install 22
+
+2. 换国内源
+   npm config set registry https://registry.npmmirror.com
+
+3. 安装 OpenClaw
+   npm install -g openclaw@2026.5.3
+
+4. 初始化配置
+   NODE_OPTIONS="--max-old-space-size=8192" node /home/HwHiAiUser/.nvm/versions/node/v22.22.3/lib/node_modules/openclaw/dist/index.js onboard
+
+5. 部署 Skill
+   把 SKILL.md 和 scripts 复制到 ~/.openclaw/skill-workshop/proposals/ 对应目录
+
+6. 配置飞书
+   NODE_OPTIONS="--max-old-space-size=8192" node /home/HwHiAiUser/.nvm/versions/node/v22.22.3/lib/node_modules/openclaw/dist/index.js channels login --channel feishu
+   按提示输入飞书 App ID 和 App Secret
+
+7. 飞书配对
+   NODE_OPTIONS="--max-old-space-size=8192" node /home/HwHiAiUser/.nvm/versions/node/v22.22.3/lib/node_modules/openclaw/dist/index.js pairing list
+   NODE_OPTIONS="--max-old-space-size=8192" node /home/HwHiAiUser/.nvm/versions/node/v22.22.3/lib/node_modules/openclaw/dist/index.js pairing approve feishu <配对码>
+
+8. 测试
+   在飞书里给机器人发消息：你好，你是谁？
+
+
+二、日常启动（已配对过）
+------------------------
+
+只需要一步，启动 Gateway：
+
+  NODE_OPTIONS="--max-old-space-size=8192" node /home/HwHiAiUser/.nvm/versions/node/v22.22.3/lib/node_modules/openclaw/dist/index.js gateway run
+
+看到以下输出即为成功：
+  [gateway] ready
+  [heartbeat] started
+  feishu[default]: WebSocket client started
+  [ws] ws client ready
+
+然后直接在飞书里发消息控制机械臂即可。
+
+
+三、常用命令
+-----------
+
+启动 Gateway：
+  NODE_OPTIONS="--max-old-space-size=8192" node /home/HwHiAiUser/.nvm/versions/node/v22.22.3/lib/node_modules/openclaw/dist/index.js gateway run
+
+停止 Gateway：
+  Ctrl+C（前台模式）
+  或：kill -9 <pid>
+
+查看 Gateway 状态：
+  systemctl --user status openclaw-gateway
+
+查看日志：
+  journalctl --user -u openclaw-gateway -f
+
+飞书配对列表：
+  NODE_OPTIONS="--max-old-space-size=8192" node /home/HwHiAiUser/.nvm/versions/node/v22.22.3/lib/node_modules/openclaw/dist/index.js pairing list
+
+审批配对：
+  NODE_OPTIONS="--max-old-space-size=8192" node /home/HwHiAiUser/.nvm/versions/node/v22.22.3/lib/node_modules/openclaw/dist/index.js pairing approve feishu <配对码>
+
+卸载微信插件（如已安装，会导致 OOM）：
+  rm -rf ~/.openclaw/npm/projects/tencent-weixin-openclaw-weixin-*
+  rm -rf ~/.openclaw/extensions/openclaw-weixin
+
+
+四、飞书发消息示例
+------------------
+
+基础操作：
+  "读取机械臂状态"
+  "把机械臂归零"
+  "打开夹爪"
+  "移动机械臂到 x=150, y=50, z=80"
+
+视觉检测：
+  "工作台上有什么？"
+  "检测一下桌上的物体"
+
+送餐流程：
+  "把汉堡放到盘子里"
+  "帮我把薯条通过传送带运到盘子里"
+
+
+五、已知限制
+-----------
+
+1. 微信插件会导致 OOM 崩溃，暂不可用
+2. Gateway 必须前台运行（systemd 服务内存配置不对）
+3. openclaw 命令在 ARM64 上会卡死，必须用 node + 完整路径
+4. conda 环境可能干扰 Node.js 内存分配，建议退出 conda 再启动
+
+
+六、Skill 清单
+--------------
+
+arm-basic        → 机械臂控制（状态/归零/移动/夹爪）
+vision-detect    → YOLO 目标检测
+coord-transform  → 坐标转换（像素→机械臂）
+conveyor-belt    → 传送带控制 + 传感器
+arm-delivery     → 送餐流程参考文档
+handeye-calibration → 手眼标定文档
+
+========================================

@@ -1,0 +1,33 @@
+# 关节限位表
+# 数据来自 05_armapp/config.py 的 THETA_LOWERB / THETA_UPPERB
+
+J1 (基座):    -1.5708 rad (-90°)  ~  1.5708 rad (90°)
+J2 (肩部):   -2.3562 rad (-135°) ~  0.0 rad (0°)
+J3 (肘部):   -0.7854 rad (-45°)  ~  2.3562 rad (135°)
+J4 (腕部):   -1.5708 rad (-90°)  ~  1.5708 rad (90°)
+夹爪:         0.0 rad (0°)       ~  1.5708 rad (90°)
+
+# 舵机原始角度转换（弧度 -> 舵机原始角度）
+# angle = JOINT2SERVO_K[i] * theta + JOINT2SERVO_B[i]
+K: [-55.959, 57.932, -55.131, -60.161, 60.224]
+B: [0.000, 87.800, 44.200, 1.900, 0.000]
+
+# 连杆长度 (mm)
+LINK23 (上臂):   80.0
+LINK34 (前臂):   70.6
+LINK45 (腕-工具): 136.0
+
+# 归零目标位姿
+INIT_POSE_XYZ: (150, 0, 50) mm
+
+# Pitch 平面拟合（自动生成俯仰角）
+# pitch = PITCH_PANEL_A * x0 + PITCH_PANEL_B * z + PITCH_PANEL_C
+# 其中 x0 = sqrt(x^2 + y^2)
+PITCH_PANEL_A: -0.0034
+PITCH_PANEL_B: -0.0047
+PITCH_PANEL_C: 2.8721
+
+# 轨迹规划参数
+TRAJECTORY_DELTA_T: 0.01   # 插补周期 (s)
+RAD_PER_STEP: 0.05         # 步进弧度
+SERVO_SPEED_DEFAULT: 100   # 舵机默认转速 (°/s)

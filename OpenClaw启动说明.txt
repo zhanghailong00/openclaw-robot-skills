@@ -1,0 +1,92 @@
+========================================
+  OpenClaw 启动说明（OrangePi AIpro 20T）
+========================================
+
+一、遇到的问题及原因
+--------------------
+
+问题1：openclaw 命令卡死
+  现象：输入 openclaw gateway start 后卡住不动，CPU 占用 90%+
+  原因：npm 安装的 openclaw 命令包装脚本在 ARM64 (aarch64) 上有 bug，会死循环
+  解决：不用 openclaw 命令，改用 node + 完整路径直接运行
+
+问题2：JavaScript heap out of memory (OOM)
+  现象：启动 tui 时崩溃，报 FATAL ERROR: NewSpace::EnsureCurrentCapacity Allocation failed
+  原因：Node.js 默认堆内存限制约 1.5GB，OpenClaw tui 在 ARM64 上需要更多
+  解决：启动 tui 时必须加 NODE_OPTIONS="--max-old-space-size=8192"
+  版本：OpenClaw 2026.6.1，Node.js v22.22.3
+
+问题3：API Key 认证失败 (401)
+  现象：DeepSeek API 返回 401，key 尾号显示 f3c6
+  原因：~/.openclaw/agents/main/agent/ 目录下缓存了一个旧的 API Key，
+       优先级比 openclaw.json 配置文件高，导致用的是旧 key
+  解决：用 sed 替换缓存文件中的旧 key
+
+问题4：systemd 服务被禁用
+  现象：tui 连不上 gateway，提示 gateway closed
+  原因：调试过程中把 openclaw-gateway systemd 服务 disable 了
+  解决：重新 enable 并 start 服务
+
+
+二、正确的启动方式（记住这三条就够了）
+----------------------------------------
+
+启动服务（终端1）：
+  systemctl --user start openclaw-gateway
+
+打开聊天（终端2）：
+  NODE_OPTIONS="--max-old-space-size=8192" node /home/HwHiAiUser/.nvm/versions/node/v22.22.3/lib/node_modules/openclaw/dist/index.js tui
+
+停止服务：
+  systemctl --user stop openclaw-gateway
+
+注意：启动 tui 前确保不在 conda 环境中，先执行 conda deactivate
+
+
+三、聊天常用命令
+--------------------
+
+开启新会话（清空上下文，省 token）：
+  /new
+
+降低思考等级（省 token，控制机械臂够用）：
+  /think off    （关闭深度推理，最省）
+  /think low    （轻度推理）
+  /think high   （深度推理，费 token）
+
+四、其他常用操作
+--------------------
+
+重启 Gateway 服务：
+  systemctl --user restart openclaw-gateway
+
+停止 Gateway 服务：
+  systemctl --user stop openclaw-gateway
+
+查看 Gateway 日志：
+  journalctl --user -u openclaw-gateway -f
+
+运行诊断：
+  node /home/HwHiAiUser/.nvm/versions/node/v22.22.3/lib/node_modules/openclaw/dist/index.js doctor
+
+命令行单条对话（不启动 tui）：
+  node /home/HwHiAiUser/.nvm/versions/node/v22.22.3/lib/node_modules/openclaw/dist/index.js agent --agent main --message "你想说的话"
+
+开机自动启动 Gateway：
+  systemctl --user enable openclaw-gateway
+
+
+四、配置文件位置
+--------------------
+
+主配置文件：
+  ~/.openclaw/openclaw.json
+
+缓存的 API Key（出问题时检查这里）：
+  ~/.openclaw/agents/main/agent/plugins/deepseek/catalog.json
+  ~/.openclaw/agents/main/agent/auth-profiles.json
+
+日志文件：
+  /tmp/openclaw/openclaw-YYYY-MM-DD.log
+
+========================================

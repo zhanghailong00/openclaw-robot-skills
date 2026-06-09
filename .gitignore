@@ -1,0 +1,14 @@
+# 忽略所有
+*
+
+# 保留 skills 目录
+!skills/
+!skills/**
+
+# 保留文本文件
+!*.md
+!*.txt
+!*.json
+
+# 保留 gitignore
+!.gitignore
