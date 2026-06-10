@@ -1,6 +1,6 @@
 ---
 name: environment-sensor
-description: 环境感知：声音检测、温度、湿度。当用户提到声音、音量、多吵、温度、湿度时使用。即使用户没有明确说"检测"，只要涉及"环境怎么样"、"声音大吗"、"温度多少"，也应该触发。
+description: 环境感知：温度、湿度、声音、光照、加速度、空气质量、颜色。当用户提到温度、湿度、声音、音量、光照、亮度、空气、颜色、RGB时使用。即使用户没有明确说"检测"，只要涉及"温度多少"、"多亮"、"空气好吗"、"是什么颜色"，也应该触发。
 allowed-tools: [exec]
 ---
 
@@ -60,10 +60,98 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/0
 {"success": true, "x": 0, "y": 0, "z": 32}
 ```
 
+### 03_light.py — 光敏电阻传感器
+
+```bash
+# 读取一次光照值
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/03_light.py
+
+# 持续监测
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/03_light.py --mode monitor --count 10
+```
+
+参数：
+- `--mode once`：读取一次（默认）
+- `--mode monitor`：持续监测
+- `--interval N`：监测间隔（秒），默认 0.5
+- `--count N`：监测次数，默认 10
+
+输出示例：
+```json
+{"success": true, "value": 512, "resistance_kohm": 9.82}
+```
+
+### 04_temperature_humidity.py — 温湿度传感器
+
+```bash
+# 读取一次温湿度
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/04_temperature_humidity.py
+
+# 持续监测
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/04_temperature_humidity.py --mode monitor --count 10
+```
+
+参数：
+- `--mode once`：读取一次（默认）
+- `--mode monitor`：持续监测
+- `--interval N`：监测间隔（秒），默认 2.0
+- `--count N`：监测次数，默认 10
+
+输出示例：
+```json
+{"success": true, "valid": true, "temperature_c": 25.3, "humidity_percent": 60.2}
+```
+
+### 05_air_quality.py — 空气质量传感器
+
+```bash
+# 读取一次空气质量
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/05_air_quality.py
+
+# 持续监测
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/05_air_quality.py --mode monitor --count 10
+```
+
+参数：
+- `--mode once`：读取一次（默认）
+- `--mode monitor`：持续监测
+- `--interval N`：监测间隔（秒），默认 0.5
+- `--count N`：监测次数，默认 10
+
+输出示例：
+```json
+{"success": true, "value": 250, "level": "fresh"}
+```
+
+### 06_color.py — 颜色识别传感器
+
+```bash
+# 读取一次颜色
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/06_color.py
+
+# 持续监测
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/06_color.py --mode monitor --count 5
+```
+
+参数：
+- `--mode once`：读取一次（默认）
+- `--mode monitor`：持续监测
+- `--interval N`：监测间隔（秒），默认 1.0
+- `--count N`：监测次数，默认 10
+
+输出示例：
+```json
+{"success": true, "r": 180, "g": 50, "b": 30, "lux": 320.5, "color_temp_k": 4500}
+```
+
 ## 硬件说明
 
 - 声音传感器：交通模块 Bscene，模拟口 A1
 - 三轴加速度传感器：交通模块 MMA7660FC，I2C 地址 0x4C
+- 光敏电阻：农业模块 Dscene，模拟口 A1
+- 温湿度传感器：农业模块 Escene，D4 口（蓝色 DHT11）
+- 空气质量传感器：农业模块 Escene，模拟口 A1
+- 颜色传感器：农业模块 TCS34725，I2C 地址 0x29
+- 污染等级：>700 高污染，>300 低污染，<=300 空气清新
+- 注意：传感器需要预热 2 分钟才能稳定读数
 - 驱动路径：`/home/HwHiAiUser/.openclaw/workspace/python_sensor`
-- 读取值范围：-32 ~ 31（6 位数字值）
-- 用途：检测设备倾斜、运动、姿态变化

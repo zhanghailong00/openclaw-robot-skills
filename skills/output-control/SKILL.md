@@ -51,6 +51,29 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/02_re
 
 输出示例：`{"success": true, "action": "on"}`
 
+### 03_servo.py — 舵机控制
+
+```bash
+# 旋转到 90°
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/03_servo.py --angle 90
+
+# 旋转到 0°
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/03_servo.py --angle 0
+
+# 扫描模式（0→180→0）
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/03_servo.py --sweep
+
+# 释放舵机
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/03_servo.py --detach
+```
+
+参数：
+- `--angle N`：目标角度 (0-180)
+- `--sweep`：扫描模式
+- `--detach`：释放舵机
+
+输出示例：`{"success": true, "angle": 90}`
+
 ### 04_led_bar.py — 多彩 LED 灯条控制
 
 ```bash
@@ -74,9 +97,30 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/04_le
 
 输出示例：`{"success": true, "color": "green"}`
 
+### 05_led_dim.py — 调光 LED 控制
+
+```bash
+# 设置亮度（0-255）
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/05_led_dim.py --brightness 255
+
+# 渐变效果
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/05_led_dim.py --fade
+
+# 关闭
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/05_led_dim.py --off
+```
+
+参数：
+- `--brightness N`：亮度值 (0-255)
+- `--fade`：渐变效果（0→255→0）
+- `--off`：关闭
+
+输出示例：`{"success": true, "brightness": 128}`
+
 ## 硬件说明
 
 - 蜂鸣器：安防模块 Ascene，数字口 D3
 - 多彩 LED 灯条：医疗模块 Cscene，数字口 D3（5 颗 LED）
+- 调光 LED：农业模块 Escene，数字口 D3（支持 PWM）
 - 驱动路径：`/home/HwHiAiUser/.openclaw/workspace/python_sensor`
-- 驱动模块：Ascene（I2C 0x0A）、Cscene（I2C 0x0C）
+- PWM 支持引脚：D3、D5、D6
