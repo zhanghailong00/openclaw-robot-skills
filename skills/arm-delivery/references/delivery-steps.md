@@ -30,21 +30,14 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to
 
 ## 步骤 4：放到传送带
 
-传送带起始端的工作台坐标是 (212.8, 62.8)mm，需要先转换为机械臂坐标：
+传送带起始端坐标 (212.8, 62.8) 可直接传给 move_to，无需转换。
 
 ```bash
-# 转换传送带起始端坐标
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/coord-transform/scripts/02_convert.py --px 212.8 --py 62.8 --json
-```
-
-拿到 arm_target 后，移动到传送带位置并松开：
-
-```bash
-# 移动到传送带起始端上方
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x <belt_start_ax> --y <belt_start_ay> --z <belt_start_az+25>
+# 移动到传送带起始端上方（62.8 + 25 = 87.8）
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 212.8 --y 62.8 --z 87.8
 
 # 下降到传送带
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x <belt_start_ax> --y <belt_start_ay> --z <belt_start_az>
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 212.8 --y 62.8 --z 62.8
 
 # 松开
 python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/03_gripper.py --action open
@@ -52,8 +45,6 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/03_gripper
 # 移到安全位
 python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 150 --y 0 --z 80
 ```
-
-注意：belt_start_ax/ay/az 是上面 coord-transform 转换出来的 arm_target 值。
 
 ## 步骤 5：传送带运输
 
@@ -73,33 +64,24 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/03_bel
 
 ## 步骤 6：从末端取餐
 
-传送带末端工作台坐标是 (218.1, -58.2)mm，需要先转换为机械臂坐标：
-
-```bash
-# 转换传送带末端坐标
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/coord-transform/scripts/02_convert.py --px 218.1 --py -58.2 --json
-```
-
-拿到 arm_target 后，取餐：
+传送带末端坐标 (218.1, -58.2) 可直接传给 move_to，无需转换。
 
 ```bash
 # 打开夹爪
 python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/03_gripper.py --action open
 
-# 移动到末端上方
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x <belt_end_ax> --y <belt_end_ay> --z <belt_end_az+25>
+# 移动到末端上方（-58.2 + 25 = -33.2）
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 218.1 --y -58.2 --z -33.2
 
 # 下降到末端
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x <belt_end_ax> --y <belt_end_ay> --z <belt_end_az>
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 218.1 --y -58.2 --z -58.2
 
 # 夹取
 python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/03_gripper.py --action close
 
 # 抬起
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x <belt_end_ax> --y <belt_end_ay> --z <belt_end_az+50>
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 218.1 --y -58.2 --z -8.2
 ```
-
-注意：belt_end_ax/ay/az 是上面 coord-transform 转换出来的 arm_target 值。
 
 ## 步骤 7：放到盘子
 
