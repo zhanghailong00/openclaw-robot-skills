@@ -62,21 +62,41 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to
 
 输出示例：`{"success": true, "target": {"x": 150.0, "y": 50.0, "z": 80.0}, "actual": {"x": 146.9, "y": -1.8, "z": 75.7}}`
 
+### 05_grab_and_place.py — 抓取并放置（合并版，速度快）
+
+```bash
+# 抓取物体，放到指定位置
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/05_grab_and_place.py --grab_x 154 --grab_y -50 --grab_z -31 --place_x 212 --place_y 62 --place_z 62
+
+# 只抓取不放置（放到安全位）
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/05_grab_and_place.py --grab_x 154 --grab_y -50 --grab_z -31
+```
+
+参数：
+- `--grab_x X`：抓取位置 X (mm)，必填
+- `--grab_y Y`：抓取位置 Y (mm)，必填
+- `--grab_z Z`：抓取位置 Z (mm)，必填
+- `--place_x X`：放置位置 X (mm)，可选
+- `--place_y Y`：放置位置 Y (mm)，可选
+- `--place_z Z`：放置位置 Z (mm)，可选
+- `--t T`：运动时间 (s)，可选，默认 0.75
+
+输出示例：`{"success": true, "action": "grab_and_place", "grab": {"x": 154, "y": -50, "z": -31}, "place": {"x": 212, "y": 62, "z": 62}}`
+
+注意：05 比单独调用 03+04 快很多，因为它只启动一次 Python 进程。
+
 ## 使用规则
 
 1. 首次操作前先调用 `01_status.py` 确认通信正常
 2. 移动前确保工作台无遮挡
 3. 脚本报错就停，不要盲目重试
 4. 关节限位由脚本自动处理，不需要手动检查
+5. 需要快速抓取放置时，优先使用 05_grab_and_place.py
 
 ## 典型调用流程
 
 ```
 ① 01_status.py          → 确认机械臂在线
 ② 02_homing.py          → 归零
-③ 03_gripper.py --action open  → 打开夹爪
-④ 04_move_to.py --x X --y Y --z Z  → 移动到目标
-⑤ 03_gripper.py --action close → 夹取
-⑥ 04_move_to.py --x X2 --y Y2 --z Z2  → 移动到放置位
-⑦ 03_gripper.py --action open  → 松开
+③ 05_grab_and_place.py  → 抓取并放置（一步完成）
 ```
