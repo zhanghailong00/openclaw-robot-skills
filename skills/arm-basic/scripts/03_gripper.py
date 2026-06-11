@@ -4,7 +4,7 @@
 
 功能：控制机械臂末端夹爪的开合
 硬件：4-DOF 机械臂上的夹爪舵机（ID=4，UART 串口通信）
-原理：通过舵机角度控制夹爪开合，45°=打开，0°=闭合
+原理：通过舵机角度控制夹爪开合，25°=打开，0°=闭合
 
 用法：
   python3 03_gripper.py --action open      # 只打开
@@ -36,7 +36,7 @@ except Exception as e:
 
 try:
     if args.action == "open":
-        arm.gripper_open(degrees=45, t=0.5)
+        arm.gripper_open(degrees=25, t=0.5)
         angle = arm.get_raw_angle_list()[4]
         print(json.dumps({"success": True, "action": "open", "angle": round(float(angle), 1)}, ensure_ascii=False))
 
@@ -48,9 +48,9 @@ try:
     else:
         # 测试模式：开→闭
         print("=== 夹爪测试 ===")
-        arm.gripper_open(degrees=45, t=0.5)
+        arm.gripper_open(degrees=25, t=0.5)
         a1 = arm.get_raw_angle_list()[4]
-        print(f"  张开 (45°): 当前角度 {a1:.1f}°")
+        print(f"  张开 (25°): 当前角度 {a1:.1f}°")
 
         arm.gripper_close(t=0.5)
         a2 = arm.get_raw_angle_list()[4]

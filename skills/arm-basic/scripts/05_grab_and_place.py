@@ -37,7 +37,7 @@ try:
     arm = Arm4DoF(device="/dev/ttyUSB1", is_init_pose=False)
 
     # 1. 打开夹爪
-    arm.gripper_open(degrees=45, t=0.5)
+    arm.gripper_open(degrees=25, t=0.5)
 
     # 2. 转向目标方向（借鉴 grab_cubic 的 atan2 逻辑）
     theta0 = math.atan2(args.grab_y, args.grab_x)
@@ -66,7 +66,7 @@ try:
         time.sleep(0.3)
 
         # 9. 松开
-        arm.gripper_open(degrees=45, t=0.5)
+        arm.gripper_open(degrees=25, t=0.5)
         time.sleep(0.3)
 
         # 10. 抬起

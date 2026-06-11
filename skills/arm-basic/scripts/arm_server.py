@@ -28,7 +28,7 @@ while True:
         action = cmd.get("action")
 
         if action == "open":
-            arm.gripper_open(degrees=cmd.get("degrees", 45), t=cmd.get("t", 0.5))
+            arm.gripper_open(degrees=cmd.get("degrees", 25), t=cmd.get("t", 0.5))
             angle = arm.get_raw_angle_list()[4]
             result = {"success": True, "action": "open", "angle": round(float(angle), 1)}
 
