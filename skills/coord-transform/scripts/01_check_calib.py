@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/miniconda3/bin/python
 """
 检查所有坐标转换标定文件 + 重投影误差验证
 """

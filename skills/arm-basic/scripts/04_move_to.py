@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/miniconda3/bin/python
 """
 移动机械臂末端到指定坐标
 

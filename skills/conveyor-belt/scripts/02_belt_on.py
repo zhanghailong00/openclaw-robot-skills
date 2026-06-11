@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/miniconda3/bin/python
 """启动传送带。"""
 import subprocess, sys
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/miniconda3/bin/python
 """
 声音传感器脚本
 

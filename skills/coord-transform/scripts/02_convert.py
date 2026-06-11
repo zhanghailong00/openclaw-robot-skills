@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/miniconda3/bin/python
 """
 坐标转换脚本
 

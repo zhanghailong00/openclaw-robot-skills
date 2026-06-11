@@ -18,13 +18,13 @@ allowed-tools: [exec]
 
 ```bash
 # 蜂鸣器响（指定时长，单位秒）
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/01_buzzer.py --action on --duration 2
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/01_buzzer.py --action on --duration 2
 
 # 蜂鸣器关闭
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/01_buzzer.py --action off
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/01_buzzer.py --action off
 
 # 蜂鸣器响一下（默认 0.5 秒）
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/01_buzzer.py --action beep
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/01_buzzer.py --action beep
 ```
 
 参数：
@@ -39,10 +39,10 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/01_bu
 
 ```bash
 # 打开继电器
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/02_relay.py --action on
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/02_relay.py --action on
 
 # 关闭继电器
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/02_relay.py --action off
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/02_relay.py --action off
 ```
 
 参数：
@@ -55,16 +55,16 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/02_re
 
 ```bash
 # 旋转到 90°
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/03_servo.py --angle 90
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/03_servo.py --angle 90
 
 # 旋转到 0°
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/03_servo.py --angle 0
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/03_servo.py --angle 0
 
 # 扫描模式（0→180→0）
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/03_servo.py --sweep
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/03_servo.py --sweep
 
 # 释放舵机
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/03_servo.py --detach
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/03_servo.py --detach
 ```
 
 参数：
@@ -78,16 +78,16 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/03_se
 
 ```bash
 # 全部亮绿色
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/04_led_bar.py --color green
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/04_led_bar.py --color green
 
 # 全部亮红色
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/04_led_bar.py --color red
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/04_led_bar.py --color red
 
 # 渐变闪烁效果
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/04_led_bar.py --pattern gradient
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/04_led_bar.py --pattern gradient
 
 # 全部关闭
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/04_led_bar.py --off
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/04_led_bar.py --off
 ```
 
 参数：
@@ -101,13 +101,13 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/04_le
 
 ```bash
 # 设置亮度（0-255）
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/05_led_dim.py --brightness 255
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/05_led_dim.py --brightness 255
 
 # 渐变效果
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/05_led_dim.py --fade
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/05_led_dim.py --fade
 
 # 关闭
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/05_led_dim.py --off
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/output-control/scripts/05_led_dim.py --off
 ```
 
 参数：

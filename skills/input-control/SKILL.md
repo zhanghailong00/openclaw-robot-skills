@@ -18,10 +18,10 @@ allowed-tools: [exec]
 
 ```bash
 # 读取一次位置和方向
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/01_joystick.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/01_joystick.py
 
 # 持续监测
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/01_joystick.py --mode monitor --count 10
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/01_joystick.py --mode monitor --count 10
 ```
 
 参数：
@@ -46,10 +46,10 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/01_joy
 
 ```bash
 # 读取一次角度
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/02_potentiometer.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/02_potentiometer.py
 
 # 持续监测
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/02_potentiometer.py --mode monitor --count 10
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/02_potentiometer.py --mode monitor --count 10
 ```
 
 参数：
@@ -67,10 +67,10 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/02_pot
 
 ```bash
 # 读取一次按键状态
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/03_button.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/03_button.py
 
 # 持续监测（按键通常需要高频监测）
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/03_button.py --mode monitor --count 100
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/03_button.py --mode monitor --count 100
 ```
 
 参数：
@@ -88,10 +88,10 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/03_but
 
 ```bash
 # 读取一次手势
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/04_gesture.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/04_gesture.py
 
 # 持续监测（在传感器前挥手）
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/04_gesture.py --mode monitor --count 100
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/input-control/scripts/04_gesture.py --mode monitor --count 100
 ```
 
 参数：

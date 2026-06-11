@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/miniconda3/bin/python
 """
 抓取并放置脚本（合并版，减少 Python 启动次数，提升速度）
 

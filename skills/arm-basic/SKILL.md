@@ -17,7 +17,7 @@ allowed-tools: [exec]
 ### 01_status.py — 读取机械臂状态（只读，安全）
 
 ```bash
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/01_status.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/01_status.py
 ```
 
 参数：无
@@ -26,7 +26,7 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/01_status.
 ### 02_homing.py — 机械臂归零
 
 ```bash
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/02_homing.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/02_homing.py
 ```
 
 参数：无
@@ -36,13 +36,13 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/02_homing.
 
 ```bash
 # 打开夹爪
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/03_gripper.py --action open
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/03_gripper.py --action open
 
 # 闭合夹爪
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/03_gripper.py --action close
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/03_gripper.py --action close
 
 # 测试模式（开→闭完整流程，不加参数）
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/03_gripper.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/03_gripper.py
 ```
 
 参数：`--action open` 或 `--action close`（不指定则执行测试）
@@ -51,7 +51,7 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/03_gripper
 ### 04_move_to.py — 移动到指定坐标
 
 ```bash
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 150 --y 50 --z 80
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 150 --y 50 --z 80
 ```
 
 参数：
@@ -66,10 +66,10 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to
 
 ```bash
 # 抓取物体，放到指定位置
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/05_grab_and_place.py --grab_x 154 --grab_y -50 --grab_z -31 --place_x 212 --place_y 62 --place_z 62
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/05_grab_and_place.py --grab_x 154 --grab_y -50 --grab_z -31 --place_x 212 --place_y 62 --place_z 62
 
 # 只抓取不放置（放到安全位）
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/05_grab_and_place.py --grab_x 154 --grab_y -50 --grab_z -31
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/05_grab_and_place.py --grab_x 154 --grab_y -50 --grab_z -31
 ```
 
 参数：

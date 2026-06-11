@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/miniconda3/bin/python
 """
 等待安防模块红外传感器检测到物体（传送带起始端）。
 阻塞直到检测到物体。

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/miniconda3/bin/python
 """拍照 -> 去畸变 -> YOLO 推理 -> JSON 输出"""
 import sys, os, json
 

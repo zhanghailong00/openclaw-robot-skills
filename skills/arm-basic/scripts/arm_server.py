@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/miniconda3/bin/python
 """机械臂常驻服务：保持串口连接，收到 socket 指令立刻执行。
 启动后监听 127.0.0.1:9999，响应时间 < 0.5 秒。
 

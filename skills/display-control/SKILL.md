@@ -17,9 +17,9 @@ allowed-tools: [exec]
 ### 01_oled_show.py — OLED 显示文字（仅支持 ASCII，不支持中文）
 
 ```bash
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/display-control/scripts/01_oled_show.py --text "Hello"
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/display-control/scripts/01_oled_show.py --text "Hello World" --x 0 --y 3
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/display-control/scripts/01_oled_show.py --text "Temp:25C\nHumidity:60%"
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/display-control/scripts/01_oled_show.py --text "Hello"
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/display-control/scripts/01_oled_show.py --text "Hello World" --x 0 --y 3
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/display-control/scripts/01_oled_show.py --text "Temp:25C\nHumidity:60%"
 ```
 
 参数：
@@ -32,7 +32,7 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/display-control/scripts/01_o
 ### 02_oled_clear.py — OLED 清屏
 
 ```bash
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/display-control/scripts/02_oled_clear.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/display-control/scripts/02_oled_clear.py
 ```
 
 参数：无
@@ -41,8 +41,8 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/display-control/scripts/02_o
 ### 03_digit_display.py — 4 位数码管显示
 
 ```bash
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/display-control/scripts/03_digit_display.py --value 1234
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/display-control/scripts/03_digit_display.py --value 12 --colon
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/display-control/scripts/03_digit_display.py --value 1234
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/display-control/scripts/03_digit_display.py --value 12 --colon
 ```
 
 参数：

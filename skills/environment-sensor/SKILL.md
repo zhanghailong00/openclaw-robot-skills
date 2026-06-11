@@ -18,13 +18,13 @@ allowed-tools: [exec]
 
 ```bash
 # 读取一次音量
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/01_sound.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/01_sound.py
 
 # 持续监测 10 次
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/01_sound.py --mode monitor --count 10
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/01_sound.py --mode monitor --count 10
 
 # 自定义阈值
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/01_sound.py --threshold 500
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/01_sound.py --threshold 500
 ```
 
 参数：
@@ -43,10 +43,10 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/0
 
 ```bash
 # 读取一次加速度
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/02_accelerometer.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/02_accelerometer.py
 
 # 持续监测 5 次
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/02_accelerometer.py --mode monitor --count 5
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/02_accelerometer.py --mode monitor --count 5
 ```
 
 参数：
@@ -64,10 +64,10 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/0
 
 ```bash
 # 读取一次光照值
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/03_light.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/03_light.py
 
 # 持续监测
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/03_light.py --mode monitor --count 10
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/03_light.py --mode monitor --count 10
 ```
 
 参数：
@@ -85,10 +85,10 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/0
 
 ```bash
 # 读取一次温湿度
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/04_temperature_humidity.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/04_temperature_humidity.py
 
 # 持续监测
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/04_temperature_humidity.py --mode monitor --count 10
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/04_temperature_humidity.py --mode monitor --count 10
 ```
 
 参数：
@@ -106,10 +106,10 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/0
 
 ```bash
 # 读取一次空气质量
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/05_air_quality.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/05_air_quality.py
 
 # 持续监测
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/05_air_quality.py --mode monitor --count 10
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/05_air_quality.py --mode monitor --count 10
 ```
 
 参数：
@@ -127,10 +127,10 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/0
 
 ```bash
 # 读取一次颜色
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/06_color.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/06_color.py
 
 # 持续监测
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/06_color.py --mode monitor --count 5
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/environment-sensor/scripts/06_color.py --mode monitor --count 5
 ```
 
 参数：

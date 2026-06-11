@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/miniconda3/bin/python
 """
 实训箱自检脚本
 检查机械臂、传感器、OpenClaw服务状态

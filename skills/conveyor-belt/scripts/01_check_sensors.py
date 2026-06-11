@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/miniconda3/bin/python
 """检测安防模块和交通模块是否正常通信。"""
 import sys
 

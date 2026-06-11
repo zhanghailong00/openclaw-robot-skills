@@ -18,10 +18,10 @@ allowed-tools: [exec]
 
 ```bash
 # 检测一次
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/obstacle-sensor/scripts/01_photoelectric.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/obstacle-sensor/scripts/01_photoelectric.py
 
 # 持续监测（每 0.5 秒检测一次，共 10 次）
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/obstacle-sensor/scripts/01_photoelectric.py --mode monitor --interval 0.5 --count 10
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/obstacle-sensor/scripts/01_photoelectric.py --mode monitor --interval 0.5 --count 10
 ```
 
 参数：
@@ -39,10 +39,10 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/obstacle-sensor/scripts/01_p
 
 ```bash
 # 读取一次距离（单位：cm）
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/obstacle-sensor/scripts/02_ultrasonic.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/obstacle-sensor/scripts/02_ultrasonic.py
 
 # 持续监测 5 次，每次间隔 1 秒
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/obstacle-sensor/scripts/02_ultrasonic.py --mode monitor --count 5 --interval 1
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/obstacle-sensor/scripts/02_ultrasonic.py --mode monitor --count 5 --interval 1
 ```
 
 参数：

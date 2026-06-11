@@ -17,7 +17,7 @@ allowed-tools: [exec]
 ### 01_check_camera.py — 测试摄像头（只读）
 
 ```bash
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/vision-detect/scripts/01_check_camera.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/vision-detect/scripts/01_check_camera.py
 ```
 
 参数：无
@@ -26,7 +26,7 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/vision-detect/scripts/01_che
 ### 02_run_detection.py — YOLO 目标检测（只读）
 
 ```bash
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/vision-detect/scripts/02_run_detection.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/vision-detect/scripts/02_run_detection.py
 ```
 
 参数：无

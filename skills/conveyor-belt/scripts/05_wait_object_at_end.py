@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/miniconda3/bin/python
 """等待物体到达传送带末端（超声波检测）。"""
 import sys, time
 

@@ -17,7 +17,7 @@ allowed-tools: [exec]
 ### 01_check_calib.py — 验证标定数据（只读）
 
 ```bash
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/coord-transform/scripts/01_check_calib.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/coord-transform/scripts/01_check_calib.py
 ```
 
 参数：无
@@ -27,13 +27,13 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/coord-transform/scripts/01_c
 
 ```bash
 # 方式1：输入像素坐标
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/coord-transform/scripts/02_convert.py --px 320 --py 240 --json
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/coord-transform/scripts/02_convert.py --px 320 --py 240 --json
 
 # 方式2：输入检测框中心
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/coord-transform/scripts/02_convert.py --cx 240 --cy 185 --json
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/coord-transform/scripts/02_convert.py --cx 240 --cy 185 --json
 
 # 方式3：输入检测框坐标
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/coord-transform/scripts/02_convert.py --xmin 200 --ymin 150 --xmax 280 --ymax 220 --json
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/coord-transform/scripts/02_convert.py --xmin 200 --ymin 150 --xmax 280 --ymax 220 --json
 ```
 
 参数：

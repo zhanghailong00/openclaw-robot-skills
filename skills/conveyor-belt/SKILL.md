@@ -17,7 +17,7 @@ allowed-tools: [exec]
 ### 01_check_sensors.py — 检查传感器通信（只读）
 
 ```bash
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/01_check_sensors.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/01_check_sensors.py
 ```
 
 参数：无
@@ -26,7 +26,7 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/01_che
 ### 02_belt_on.py — 启动传送带
 
 ```bash
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/02_belt_on.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/02_belt_on.py
 ```
 
 参数：无
@@ -35,7 +35,7 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/02_bel
 ### 03_belt_off.py — 停止传送带
 
 ```bash
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/03_belt_off.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/03_belt_off.py
 ```
 
 参数：无
@@ -44,7 +44,7 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/03_bel
 ### 04_wait_object_at_start.py — 等待物体到传送带起始端（阻塞）
 
 ```bash
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/04_wait_object_at_start.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/04_wait_object_at_start.py
 ```
 
 参数：无
@@ -54,7 +54,7 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/04_wai
 ### 05_wait_object_at_end.py — 等待物体到传送带末端（阻塞）
 
 ```bash
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/05_wait_object_at_end.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/05_wait_object_at_end.py
 ```
 
 参数：无

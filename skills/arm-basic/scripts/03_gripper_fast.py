@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/miniconda3/bin/python
 """夹爪控制（通过常驻服务调用，响应 < 0.5 秒）
 
 用法：

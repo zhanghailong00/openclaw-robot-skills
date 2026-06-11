@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/miniconda3/bin/python
 """
 实训箱自检脚本（wrapper 版本）
 通过 monkey-patch 解决 smbus2 新版本 read_i2c_block_data 缺少 length 参数的问题

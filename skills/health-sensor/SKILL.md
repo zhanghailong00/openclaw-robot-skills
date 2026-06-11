@@ -18,10 +18,10 @@ allowed-tools: [exec]
 
 ```bash
 # 读取心率和血氧（默认采集 5 秒）
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/health-sensor/scripts/01_pulse.py
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/health-sensor/scripts/01_pulse.py
 
 # 采集 10 秒数据（更准确）
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/health-sensor/scripts/01_pulse.py --duration 10
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/health-sensor/scripts/01_pulse.py --duration 10
 ```
 
 参数：
