@@ -62,14 +62,17 @@ allowed-tools: [exec]
 
 输出示例：`{"success": true, "target": {"x": 150.0, "y": 50.0, "z": 80.0}, "actual": {"x": 146.9, "y": -1.8, "z": 75.7}}`
 
-### 05_grab_and_place.py — 抓取并放置（合并版，速度快）
+### 05_grab_and_place.py — 抓取并放置（合并版，速度快，安全位过渡）
 
 ```bash
-# 抓取物体，放到指定位置
+# 抓取物体，放到指定位置（默认经过安全位）
 /usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/05_grab_and_place.py --grab_x 154 --grab_y -50 --grab_z -31 --place_x 212 --place_y 62 --place_z 62
 
 # 只抓取不放置（放到安全位）
 /usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/05_grab_and_place.py --grab_x 154 --grab_y -50 --grab_z -31
+
+# 不经过安全位（连续操作时用）
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/05_grab_and_place.py --grab_x 154 --grab_y -50 --grab_z -31 --place_x 212 --place_y 62 --place_z 62 --no-safe
 ```
 
 参数：
@@ -80,10 +83,22 @@ allowed-tools: [exec]
 - `--place_y Y`：放置位置 Y (mm)，可选
 - `--place_z Z`：放置位置 Z (mm)，可选
 - `--t T`：运动时间 (s)，可选，默认 0.75
+- `--no-safe`：不经过安全位（可选，默认经过安全位）
 
-输出示例：`{"success": true, "action": "grab_and_place", "grab": {"x": 154, "y": -50, "z": -31}, "place": {"x": 212, "y": 62, "z": 62}}`
+流程：
+```
+开爪 → 转向 → 悬停 → 下降 → 夹取 → 抬起
+  → 安全位 (150, 0, 80)     ← 默认经过
+  → 放置位上方 → 下降 → 松开 → 抬起
+  → 安全位 (150, 0, 80)     ← 默认经过
+```
 
-注意：05 比单独调用 03+04 快很多，因为它只启动一次 Python 进程。
+输出示例：`{"success": true, "action": "grab_and_place", "grab": {"x": 154, "y": -50, "z": -31}, "place": {"x": 212, "y": 62, "z": 62}, "safe_pos": [150, 0, 80]}`
+
+注意：
+- 05 比单独调用 03+04 快很多，因为它只启动一次 Python 进程
+- 默认经过安全位过渡，避免路径横甩
+- 连续操作时可用 `--no-safe` 跳过安全位
 
 ## 使用规则
 
@@ -98,5 +113,14 @@ allowed-tools: [exec]
 ```
 ① 01_status.py          → 确认机械臂在线
 ② 02_homing.py          → 归零
-③ 05_grab_and_place.py  → 抓取并放置（一步完成）
+③ 05_grab_and_place.py  → 抓取并放置（一步完成，自动经过安全位）
 ```
+
+## 安全位说明
+
+安全位坐标：`(150, 0, 80)mm`
+
+- 抓取后会经过安全位再移动到放置位置
+- 放置后会回到安全位再执行下一步操作
+- 避免路径横甩，减少意外碰撞
+- 可用 `--no-safe` 参数跳过（连续操作时）

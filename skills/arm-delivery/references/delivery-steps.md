@@ -30,17 +30,20 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to
 
 ## 步骤 4：放到传送带
 
-传送带起始端坐标 (212.8, 62.8) 可直接传给 move_to，无需转换。
+传送带起始端机械臂坐标：**(215.0, 69.9, -31.2)**，可直接传给 move_to。
 
 ```bash
-# 移动到传送带起始端上方（62.8 + 25 = 87.8）
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 212.8 --y 62.8 --z 87.8
+# 移动到传送带起始端上方（-31.2 + 25 = -6.2mm 悬停）
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 215.0 --y 69.9 --z -6.2
 
-# 下降到传送带
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 212.8 --y 62.8 --z 62.8
+# 下降到传送带（Z = -31.2mm）
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 215.0 --y 69.9 --z -31.2
 
 # 松开
 python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/03_gripper.py --action open
+
+# 抬起（-31.2 + 25 = -6.2mm）
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 215.0 --y 69.9 --z -6.2
 
 # 移到安全位
 python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 150 --y 0 --z 80
@@ -64,23 +67,23 @@ python3 /home/HwHiAiUser/.openclaw/workspace/skills/conveyor-belt/scripts/03_bel
 
 ## 步骤 6：从末端取餐
 
-传送带末端坐标 (218.1, -58.2) 可直接传给 move_to，无需转换。
+传送带末端机械臂坐标：**(209.8, -80.0, -31.2)**，可直接传给 move_to。
 
 ```bash
 # 打开夹爪
 python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/03_gripper.py --action open
 
-# 移动到末端上方（-58.2 + 25 = -33.2）
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 218.1 --y -58.2 --z -33.2
+# 移动到末端上方（-31.2 + 25 = -6.2mm 悬停）
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 209.8 --y -80.0 --z -6.2
 
-# 下降到末端
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 218.1 --y -58.2 --z -58.2
+# 下降到末端（Z = -31.2mm）
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 209.8 --y -80.0 --z -31.2
 
 # 夹取
 python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/03_gripper.py --action close
 
-# 抬起
-python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 218.1 --y -58.2 --z -8.2
+# 抬起（-31.2 + 25 = -6.2mm）
+python3 /home/HwHiAiUser/.openclaw/workspace/skills/arm-basic/scripts/04_move_to.py --x 209.8 --y -80.0 --z -6.2
 ```
 
 ## 步骤 7：放到盘子
