@@ -1,0 +1,351 @@
+#!/usr/local/miniconda3/bin/python
+"""
+家具整理 - 抓取放置执行
+功能：根据物品类别和放置位置，执行抓取和放置动作
+"""
+
+import sys
+import os
+import json
+import math
+import argparse
+import subprocess
+
+# ==================== 配置 ====================
+
+# Python解释器路径
+PYTHON_PATH = "/usr/local/miniconda3/bin/python"
+
+# 技能目录
+SKILLS_DIR = "/home/HwHiAiUser/.openclaw/workspace/skills"
+
+# 坐标转换脚本路径
+COORD_WS2ARM_SCRIPT = os.path.join(SKILLS_DIR, "coord-transform/scripts/04_ws2arm.py")
+
+# 基础运动脚本路径
+ARM_MOVE_SCRIPT = os.path.join(SKILLS_DIR, "arm-basic/scripts/04_move_to.py")
+
+# 夹爪控制脚本路径
+ARM_GRIPPER_SCRIPT = os.path.join(SKILLS_DIR, "arm-basic/scripts/03_gripper.py")
+
+# 安全高度（mm）
+SAFE_HEIGHT = 80
+
+# 夹爪参数
+GRIPPER_OPEN_DEGREES = 25
+GRIPPER_CLOSE_DEGREES = 0
+GRIPPER_SPEED = 50
+
+# 物品中文名称
+TYPE_LABELS = {
+    'cola': '可乐',
+    'hanbao': '汉堡',
+    'shutiao': '薯条',
+}
+
+# 物品默认高度（mm）
+DEFAULT_HEIGHT = -31.2
+
+
+# ==================== 坐标转换 ====================
+
+def workspace_to_arm(ws_x, ws_y):
+    """工作台坐标转机械臂坐标"""
+    cmd = [
+        PYTHON_PATH,
+        COORD_WS2ARM_SCRIPT,
+        "--ws", f"{ws_x},{ws_y}",
+        "--json"
+    ]
+
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        return None, None
+
+    try:
+        data = json.loads(result.stdout)
+        if data.get('status') == 'ok':
+            arm = data.get('arm', {})
+            return arm.get('x'), arm.get('y')
+    except json.JSONDecodeError:
+        pass
+
+    return None, None
+
+
+# ==================== 机械臂控制 ====================
+
+def parse_json_output(stdout):
+    """从stdout中提取JSON对象"""
+    try:
+        stdout = stdout.strip()
+        # 查找所有 JSON 对象
+        json_objects = []
+        i = 0
+        while i < len(stdout):
+            start = stdout.find('{', i)
+            if start == -1:
+                break
+
+            # 找到匹配的结束括号
+            depth = 0
+            end = start
+            for j in range(start, len(stdout)):
+                if stdout[j] == '{':
+                    depth += 1
+                elif stdout[j] == '}':
+                    depth -= 1
+                    if depth == 0:
+                        end = j + 1
+                        break
+
+            if depth == 0:
+                json_str = stdout[start:end]
+                try:
+                    obj = json.loads(json_str)
+                    json_objects.append(obj)
+                except json.JSONDecodeError:
+                    pass
+                i = end
+            else:
+                i = start + 1
+
+        # 返回最后一个JSON对象
+        if json_objects:
+            return json_objects[-1]
+    except Exception:
+        pass
+    return None
+
+
+def move_arm(x, y, z):
+    """移动机械臂到指定位置"""
+    cmd = [
+        PYTHON_PATH,
+        ARM_MOVE_SCRIPT,
+        "--x", str(x),
+        "--y", str(y),
+        "--z", str(z)
+    ]
+
+    print(f"[DEBUG] 执行命令: {' '.join(cmd)}")
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    print(f"[DEBUG] returncode: {result.returncode}")
+    print(f"[DEBUG] stdout: {result.stdout[:200]}")
+    print(f"[DEBUG] stderr: {result.stderr[:200]}")
+
+    if result.returncode != 0:
+        print(f"[DEBUG] move_arm 失败")
+        return False
+
+    data = parse_json_output(result.stdout)
+    print(f"[DEBUG] 解析结果: {data}")
+    if data:
+        return data.get('success') == True
+    return False
+
+
+def control_gripper(open=True):
+    """控制夹爪开合"""
+    action = "open" if open else "close"
+
+    cmd = [
+        PYTHON_PATH,
+        ARM_GRIPPER_SCRIPT,
+        "--action", action
+    ]
+
+    print(f"[DEBUG] 执行命令: {' '.join(cmd)}")
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    print(f"[DEBUG] returncode: {result.returncode}")
+    print(f"[DEBUG] stdout: {result.stdout[:200]}")
+    print(f"[DEBUG] stderr: {result.stderr[:200]}")
+
+    if result.returncode != 0:
+        print(f"[DEBUG] control_gripper 失败")
+        return False
+
+    data = parse_json_output(result.stdout)
+    print(f"[DEBUG] 解析结果: {data}")
+    if data:
+        return data.get('success') == True
+    return False
+
+
+# ==================== 抓取放置流程 ====================
+
+def grab_object(grab_pos):
+    """
+    抓取物品
+
+    参数：
+        grab_pos: [x, y, z] 抓取位置（机械臂坐标）
+    """
+    print(f"移动到抓取位置上方 ({grab_pos[0]}, {grab_pos[1]}, {SAFE_HEIGHT})")
+
+    # 1. 移动到抓取位置上方
+    if not move_arm(grab_pos[0], grab_pos[1], SAFE_HEIGHT):
+        return False, "移动到抓取位置上方失败"
+
+    print(f"打开夹爪")
+    # 2. 打开夹爪
+    if not control_gripper(open=True):
+        return False, "打开夹爪失败"
+
+    print(f"下降到抓取位置 ({grab_pos[0]}, {grab_pos[1]}, {grab_pos[2]})")
+    # 3. 下降到抓取位置
+    if not move_arm(grab_pos[0], grab_pos[1], grab_pos[2]):
+        return False, "下降到抓取位置失败"
+
+    print(f"关闭夹爪")
+    # 4. 关闭夹爪（抓取）
+    if not control_gripper(open=False):
+        return False, "关闭夹爪失败"
+
+    print(f"抬起到安全高度")
+    # 5. 抬起
+    if not move_arm(grab_pos[0], grab_pos[1], SAFE_HEIGHT):
+        return False, "抬起失败"
+
+    return True, "抓取成功"
+
+
+def place_object(place_pos):
+    """
+    放置物品
+
+    参数：
+        place_pos: [x, y, z] 放置位置（机械臂坐标）
+    """
+    print(f"移动到放置位置上方 ({place_pos[0]}, {place_pos[1]}, {SAFE_HEIGHT})")
+
+    # 1. 移动到放置位置上方
+    if not move_arm(place_pos[0], place_pos[1], SAFE_HEIGHT):
+        return False, "移动到放置位置上方失败"
+
+    print(f"下降到放置位置 ({place_pos[0]}, {place_pos[1]}, {place_pos[2]})")
+    # 2. 下降到放置位置
+    if not move_arm(place_pos[0], place_pos[1], place_pos[2]):
+        return False, "下降到放置位置失败"
+
+    print(f"打开夹爪")
+    # 3. 打开夹爪（放置）
+    if not control_gripper(open=True):
+        return False, "打开夹爪失败"
+
+    print(f"抬起到安全高度")
+    # 4. 抬起
+    if not move_arm(place_pos[0], place_pos[1], SAFE_HEIGHT):
+        return False, "抬起失败"
+
+    return True, "放置成功"
+
+
+def grab_and_place(grab_pos, place_pos):
+    """
+    完整的抓取-放置流程
+
+    参数：
+        grab_pos: [x, y, z] 抓取位置
+        place_pos: [x, y, z] 放置位置
+    """
+    # 1. 抓取
+    success, message = grab_object(grab_pos)
+    if not success:
+        return False, message
+
+    # 2. 放置
+    success, message = place_object(place_pos)
+    if not success:
+        return False, message
+
+    return True, "抓取放置完成"
+
+
+# ==================== 主函数 ====================
+
+def main():
+    """主函数"""
+    parser = argparse.ArgumentParser(description='家具整理 - 抓取放置执行')
+    parser.add_argument('--obj', type=str, required=True,
+                        help='物品类别（cola/hanbao/shutiao）')
+    parser.add_argument('--place', type=str, required=True,
+                        help='放置位置坐标 x,y,z（机械臂坐标）')
+    parser.add_argument('--grab-pos', type=str, default='',
+                        help='抓取位置坐标 x,y,z（可选，默认从视觉获取）')
+    parser.add_argument('--grab-ws', type=str, default='',
+                        help='抓取位置工作台坐标 x,y（可选，会自动转换为机械臂坐标）')
+    parser.add_argument('--json', action='store_true',
+                        help='JSON格式输出')
+
+    args = parser.parse_args()
+
+    # 解析放置位置
+    try:
+        place_pos = [float(x) for x in args.place.split(',')]
+    except ValueError:
+        print(json.dumps({"error": "放置位置坐标格式错误"}, ensure_ascii=False))
+        sys.exit(1)
+
+    # 获取抓取位置
+    grab_pos = None
+
+    if args.grab_pos:
+        # 直接使用机械臂坐标
+        try:
+            grab_pos = [float(x) for x in args.grab_pos.split(',')]
+        except ValueError:
+            print(json.dumps({"error": "抓取位置坐标格式错误"}, ensure_ascii=False))
+            sys.exit(1)
+    elif args.grab_ws:
+        # 使用工作台坐标，需要转换
+        try:
+            ws_x, ws_y = [float(x) for x in args.grab_ws.split(',')]
+            arm_x, arm_y = workspace_to_arm(ws_x, ws_y)
+            if arm_x is None:
+                print(json.dumps({"error": "工作台坐标转换失败"}, ensure_ascii=False))
+                sys.exit(1)
+            grab_pos = [arm_x, arm_y, DEFAULT_HEIGHT]
+        except ValueError:
+            print(json.dumps({"error": "工作台坐标格式错误"}, ensure_ascii=False))
+            sys.exit(1)
+    else:
+        print(json.dumps({"error": "未指定抓取位置"}, ensure_ascii=False))
+        sys.exit(1)
+
+    # 获取物品标签
+    label = TYPE_LABELS.get(args.obj, args.obj)
+
+    print(f"开始抓取放置: {label}")
+    print(f"抓取位置: {grab_pos}")
+    print(f"放置位置: {place_pos}")
+
+    # 执行抓取放置
+    success, message = grab_and_place(grab_pos, place_pos)
+
+    # 输出结果
+    output = {
+        "object": args.obj,
+        "label": label,
+        "grab_position": {
+            "x": grab_pos[0],
+            "y": grab_pos[1],
+            "z": grab_pos[2]
+        },
+        "place_position": {
+            "x": place_pos[0],
+            "y": place_pos[1],
+            "z": place_pos[2]
+        },
+        "message": message,
+        "status": "ok" if success else "error"
+    }
+
+    if args.json:
+        print(json.dumps(output, ensure_ascii=False, indent=2))
+    else:
+        print(f"\n结果: {message}")
+
+
+if __name__ == "__main__":
+    main()
