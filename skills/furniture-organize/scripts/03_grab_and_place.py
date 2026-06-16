@@ -1,7 +1,22 @@
 #!/usr/local/miniconda3/bin/python
 """
-家具整理 - 抓取放置执行
-功能：根据物品类别和放置位置，执行抓取和放置动作
+家具整理 - 抓取放置执行（重构版）
+
+功能：一次进程完成抓取放置，支持避障
+硬件：4-DOF 机械臂（UART 串口，/dev/ttyUSB1）
+优势：相比子进程方式，减少5次Python启动，节省约2.75秒
+
+用法：
+  # 基础用法
+  python 03_grab_and_place.py --obj hanbao --grab-pos 163,53,-31 --place 100,0,-31
+
+  # 带障碍物
+  python 03_grab_and_place.py --obj hanbao --grab-pos 163,53,-31 --place 100,0,-31 --obstacles "130,25,80,30"
+
+  # 关闭避障（更快）
+  python 03_grab_and_place.py --obj hanbao --grab-pos 163,53,-31 --place 100,0,-31 --no-avoid
+
+输出：JSON 格式
 """
 
 import sys
@@ -9,35 +24,33 @@ import os
 import json
 import math
 import argparse
-import subprocess
+import time
+
+# 加载机械臂 SDK
+sys.path.insert(0, "/home/HwHiAiUser/arm_voice_soft")
+sys.path.insert(0, "/home/HwHiAiUser/arm_voice_soft/utils_arm")
+
+from arm4dof import Arm4DoF
 
 # ==================== 配置 ====================
-
-# Python解释器路径
-PYTHON_PATH = "/usr/local/miniconda3/bin/python"
-
-# 技能目录
-SKILLS_DIR = "/home/HwHiAiUser/.openclaw/workspace/skills"
-
-# 坐标转换脚本路径
-COORD_WS2ARM_SCRIPT = os.path.join(SKILLS_DIR, "coord-transform/scripts/04_ws2arm.py")
-
-# 基础运动脚本路径
-ARM_MOVE_SCRIPT = os.path.join(SKILLS_DIR, "arm-basic/scripts/04_move_to.py")
-
-# 夹爪控制脚本路径
-ARM_GRIPPER_SCRIPT = os.path.join(SKILLS_DIR, "arm-basic/scripts/03_gripper.py")
 
 # 安全高度（mm）
 SAFE_HEIGHT = 80
 
+# 安全位坐标
+SAFE_POS = [150, 0, 80]
+
+# 悬停高度（抓取/放置位置上方）
+HOVER_HEIGHT = 25
+
 # 最小安全距离（mm）
 MIN_SAFE_DISTANCE = 50
 
-# 夹爪参数
-GRIPPER_OPEN_DEGREES = 25
-GRIPPER_CLOSE_DEGREES = 0
-GRIPPER_SPEED = 50
+# 运动时间（秒）
+MOVE_TIME = 0.75
+
+# 夹爪动作时间（秒）
+GRIPPER_TIME = 0.5
 
 # 物品中文名称
 TYPE_LABELS = {
@@ -49,131 +62,6 @@ TYPE_LABELS = {
 
 # 物品默认高度（mm）
 DEFAULT_HEIGHT = -31.2
-
-
-# ==================== 坐标转换 ====================
-
-def workspace_to_arm(ws_x, ws_y):
-    """工作台坐标转机械臂坐标"""
-    cmd = [
-        PYTHON_PATH,
-        COORD_WS2ARM_SCRIPT,
-        "--ws", f"{ws_x},{ws_y}",
-        "--json"
-    ]
-
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    if result.returncode != 0:
-        return None, None
-
-    try:
-        data = json.loads(result.stdout)
-        if data.get('status') == 'ok':
-            arm = data.get('arm', {})
-            return arm.get('x'), arm.get('y')
-    except json.JSONDecodeError:
-        pass
-
-    return None, None
-
-
-# ==================== 机械臂控制 ====================
-
-def parse_json_output(stdout):
-    """从stdout中提取JSON对象"""
-    try:
-        stdout = stdout.strip()
-        # 查找所有 JSON 对象
-        json_objects = []
-        i = 0
-        while i < len(stdout):
-            start = stdout.find('{', i)
-            if start == -1:
-                break
-
-            # 找到匹配的结束括号
-            depth = 0
-            end = start
-            for j in range(start, len(stdout)):
-                if stdout[j] == '{':
-                    depth += 1
-                elif stdout[j] == '}':
-                    depth -= 1
-                    if depth == 0:
-                        end = j + 1
-                        break
-
-            if depth == 0:
-                json_str = stdout[start:end]
-                try:
-                    obj = json.loads(json_str)
-                    json_objects.append(obj)
-                except json.JSONDecodeError:
-                    pass
-                i = end
-            else:
-                i = start + 1
-
-        # 返回最后一个JSON对象
-        if json_objects:
-            return json_objects[-1]
-    except Exception:
-        pass
-    return None
-
-
-def move_arm(x, y, z):
-    """移动机械臂到指定位置"""
-    cmd = [
-        PYTHON_PATH,
-        ARM_MOVE_SCRIPT,
-        "--x", str(x),
-        "--y", str(y),
-        "--z", str(z)
-    ]
-
-    print(f"[DEBUG] 执行命令: {' '.join(cmd)}")
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    print(f"[DEBUG] returncode: {result.returncode}")
-    print(f"[DEBUG] stdout: {result.stdout[:200]}")
-    print(f"[DEBUG] stderr: {result.stderr[:200]}")
-
-    if result.returncode != 0:
-        print(f"[DEBUG] move_arm 失败")
-        return False
-
-    data = parse_json_output(result.stdout)
-    print(f"[DEBUG] 解析结果: {data}")
-    if data:
-        return data.get('success') == True
-    return False
-
-
-def control_gripper(open=True):
-    """控制夹爪开合"""
-    action = "open" if open else "close"
-
-    cmd = [
-        PYTHON_PATH,
-        ARM_GRIPPER_SCRIPT,
-        "--action", action
-    ]
-
-    print(f"[DEBUG] 执行命令: {' '.join(cmd)}")
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    print(f"[DEBUG] returncode: {result.returncode}")
-    print(f"[DEBUG] stdout: {result.stdout[:200]}")
-    print(f"[DEBUG] stderr: {result.stderr[:200]}")
-
-    if result.returncode != 0:
-        print(f"[DEBUG] control_gripper 失败")
-        return False
-
-    data = parse_json_output(result.stdout)
-    print(f"[DEBUG] 解析结果: {data}")
-    if data:
-        return data.get('success') == True
-    return False
 
 
 # ==================== 避障功能 ====================
@@ -285,134 +173,6 @@ def calculate_detour_point(start, end, obstacles):
     return [end[0], end[1], SAFE_HEIGHT]
 
 
-def move_with_obstacle_avoidance(start, end, obstacles=None):
-    """带避障的移动"""
-    # 1. 先抬升到安全高度
-    if start[2] < SAFE_HEIGHT:
-        print(f"  [避障] 抬升到安全高度")
-        if not move_arm(start[0], start[1], SAFE_HEIGHT):
-            return False
-
-    # 2. 检查是否需要避障
-    if obstacles and need_detour(start, end, obstacles):
-        print(f"  [避障] 检测到障碍物，计算绕行路径")
-        detour_point = calculate_detour_point(start, end, obstacles)
-        print(f"  [避障] 绕行点: {detour_point}")
-
-        # 移动到绕行点
-        if not move_arm(detour_point[0], detour_point[1], SAFE_HEIGHT):
-            return False
-
-        # 从绕行点移动到目标上方
-        if not move_arm(end[0], end[1], SAFE_HEIGHT):
-            return False
-    else:
-        # 无障碍物，直接移动到目标上方
-        if not move_arm(end[0], end[1], SAFE_HEIGHT):
-            return False
-
-    # 3. 下降到目标位置
-    if not move_arm(end[0], end[1], end[2]):
-        return False
-
-    return True
-
-
-# ==================== 抓取放置流程 ====================
-
-def grab_object(grab_pos, obstacles=None):
-    """
-    抓取物品
-
-    参数：
-        grab_pos: [x, y, z] 抓取位置（机械臂坐标）
-        obstacles: 障碍物列表（可选）
-    """
-    print(f"移动到抓取位置上方 ({grab_pos[0]}, {grab_pos[1]}, {SAFE_HEIGHT})")
-
-    # 1. 移动到抓取位置上方（带避障）
-    current_pos = [grab_pos[0], grab_pos[1], SAFE_HEIGHT]  # 假设当前位置
-    if not move_with_obstacle_avoidance(current_pos, grab_pos, obstacles):
-        return False, "移动到抓取位置上方失败"
-
-    print(f"打开夹爪")
-    # 2. 打开夹爪
-    if not control_gripper(open=True):
-        return False, "打开夹爪失败"
-
-    print(f"下降到抓取位置 ({grab_pos[0]}, {grab_pos[1]}, {grab_pos[2]})")
-    # 3. 下降到抓取位置
-    if not move_arm(grab_pos[0], grab_pos[1], grab_pos[2]):
-        return False, "下降到抓取位置失败"
-
-    print(f"关闭夹爪")
-    # 4. 关闭夹爪（抓取）
-    if not control_gripper(open=False):
-        return False, "关闭夹爪失败"
-
-    print(f"抬起到安全高度")
-    # 5. 抬起
-    if not move_arm(grab_pos[0], grab_pos[1], SAFE_HEIGHT):
-        return False, "抬起失败"
-
-    return True, "抓取成功"
-
-
-def place_object(place_pos, obstacles=None):
-    """
-    放置物品
-
-    参数：
-        place_pos: [x, y, z] 放置位置（机械臂坐标）
-        obstacles: 障碍物列表（可选）
-    """
-    print(f"移动到放置位置上方 ({place_pos[0]}, {place_pos[1]}, {SAFE_HEIGHT})")
-
-    # 1. 移动到放置位置上方（带避障）
-    current_pos = [place_pos[0], place_pos[1], SAFE_HEIGHT]  # 假设当前位置
-    if not move_with_obstacle_avoidance(current_pos, place_pos, obstacles):
-        return False, "移动到放置位置上方失败"
-
-    print(f"下降到放置位置 ({place_pos[0]}, {place_pos[1]}, {place_pos[2]})")
-    # 2. 下降到放置位置
-    if not move_arm(place_pos[0], place_pos[1], place_pos[2]):
-        return False, "下降到放置位置失败"
-
-    print(f"打开夹爪")
-    # 3. 打开夹爪（放置）
-    if not control_gripper(open=True):
-        return False, "打开夹爪失败"
-
-    print(f"抬起到安全高度")
-    # 4. 抬起
-    if not move_arm(place_pos[0], place_pos[1], SAFE_HEIGHT):
-        return False, "抬起失败"
-
-    return True, "放置成功"
-
-
-def grab_and_place(grab_pos, place_pos, obstacles=None):
-    """
-    完整的抓取-放置流程
-
-    参数：
-        grab_pos: [x, y, z] 抓取位置
-        place_pos: [x, y, z] 放置位置
-        obstacles: 障碍物列表（可选）
-    """
-    # 1. 抓取
-    success, message = grab_object(grab_pos, obstacles)
-    if not success:
-        return False, message
-
-    # 2. 放置
-    success, message = place_object(place_pos, obstacles)
-    if not success:
-        return False, message
-
-    return True, "抓取放置完成"
-
-
 # ==================== 主函数 ====================
 
 def main():
@@ -424,46 +184,33 @@ def main():
                         help='放置位置坐标 x,y,z（机械臂坐标）')
     parser.add_argument('--grab-pos', type=str, default='',
                         help='抓取位置坐标 x,y,z（可选，默认从视觉获取）')
-    parser.add_argument('--grab-ws', type=str, default='',
-                        help='抓取位置工作台坐标 x,y（可选，会自动转换为机械臂坐标）')
     parser.add_argument('--obstacles', type=str, default='',
                         help='障碍物列表 x1,y1,z1,r1;x2,y2,z2,r2（可选）')
+    parser.add_argument('--no-avoid', action='store_true',
+                        help='关闭避障功能（更快）')
+    parser.add_argument('--no-safe', action='store_true',
+                        help='不经过安全位（直接路径）')
     parser.add_argument('--json', action='store_true',
                         help='JSON格式输出')
 
     args = parser.parse_args()
+
+    # 解析抓取位置
+    if not args.grab_pos:
+        print(json.dumps({"error": "未指定抓取位置"}, ensure_ascii=False))
+        sys.exit(1)
+
+    try:
+        grab_pos = [float(x) for x in args.grab_pos.split(',')]
+    except ValueError:
+        print(json.dumps({"error": "抓取位置坐标格式错误"}, ensure_ascii=False))
+        sys.exit(1)
 
     # 解析放置位置
     try:
         place_pos = [float(x) for x in args.place.split(',')]
     except ValueError:
         print(json.dumps({"error": "放置位置坐标格式错误"}, ensure_ascii=False))
-        sys.exit(1)
-
-    # 获取抓取位置
-    grab_pos = None
-
-    if args.grab_pos:
-        # 直接使用机械臂坐标
-        try:
-            grab_pos = [float(x) for x in args.grab_pos.split(',')]
-        except ValueError:
-            print(json.dumps({"error": "抓取位置坐标格式错误"}, ensure_ascii=False))
-            sys.exit(1)
-    elif args.grab_ws:
-        # 使用工作台坐标，需要转换
-        try:
-            ws_x, ws_y = [float(x) for x in args.grab_ws.split(',')]
-            arm_x, arm_y = workspace_to_arm(ws_x, ws_y)
-            if arm_x is None:
-                print(json.dumps({"error": "工作台坐标转换失败"}, ensure_ascii=False))
-                sys.exit(1)
-            grab_pos = [arm_x, arm_y, DEFAULT_HEIGHT]
-        except ValueError:
-            print(json.dumps({"error": "工作台坐标格式错误"}, ensure_ascii=False))
-            sys.exit(1)
-    else:
-        print(json.dumps({"error": "未指定抓取位置"}, ensure_ascii=False))
         sys.exit(1)
 
     # 解析障碍物
@@ -489,31 +236,115 @@ def main():
     if obstacles:
         print(f"障碍物数量: {len(obstacles)}")
 
-    # 执行抓取放置
-    success, message = grab_and_place(grab_pos, place_pos, obstacles)
+    # 初始化机械臂
+    try:
+        arm = Arm4DoF(device="/dev/ttyUSB1", is_init_pose=False)
+    except Exception as e:
+        print(json.dumps({"success": False, "error": f"机械臂连接失败: {str(e)}"}, ensure_ascii=False))
+        sys.exit(1)
 
-    # 输出结果
-    output = {
-        "object": args.obj,
-        "label": label,
-        "grab_position": {
-            "x": grab_pos[0],
-            "y": grab_pos[1],
-            "z": grab_pos[2]
-        },
-        "place_position": {
-            "x": place_pos[0],
-            "y": place_pos[1],
-            "z": place_pos[2]
-        },
-        "message": message,
-        "status": "ok" if success else "error"
-    }
+    try:
+        # ========== 抓取流程 ==========
 
-    if args.json:
-        print(json.dumps(output, ensure_ascii=False, indent=2))
-    else:
-        print(f"\n结果: {message}")
+        # 1. 打开夹爪
+        print("打开夹爪")
+        arm.gripper_open(degrees=25, t=GRIPPER_TIME)
+
+        # 2. 转向目标方向（atan2计算）
+        print("转向目标方向")
+        theta0 = math.atan2(grab_pos[1], grab_pos[0])
+        arm.set_joint2({0: theta0}, T=0.5)
+
+        # 3. 避障：如果需要绕行
+        if not args.no_avoid and obstacles:
+            current_pos = SAFE_POS
+            target_hover = [grab_pos[0], grab_pos[1], SAFE_HEIGHT]
+
+            if need_detour(current_pos, target_hover, obstacles):
+                print("[避障] 检测到障碍物，计算绕行路径")
+                detour_point = calculate_detour_point(current_pos, target_hover, obstacles)
+                print(f"[避障] 绕行点: {detour_point}")
+                arm.move(detour_point, t=MOVE_TIME, wait=True)
+
+        # 4. 移动到抓取位置上方（悬停）
+        print(f"移动到抓取位置上方 ({grab_pos[0]}, {grab_pos[1]}, {grab_pos[2] + HOVER_HEIGHT})")
+        arm.move([grab_pos[0], grab_pos[1], grab_pos[2] + HOVER_HEIGHT], t=MOVE_TIME, wait=True)
+
+        # 5. 下降到抓取位置
+        print(f"下降到抓取位置 ({grab_pos[0]}, {grab_pos[1]}, {grab_pos[2]})")
+        arm.move(grab_pos, t=MOVE_TIME, wait=True)
+        time.sleep(0.3)
+
+        # 6. 夹取
+        print("关闭夹爪")
+        arm.gripper_close(t=GRIPPER_TIME)
+        time.sleep(0.3)
+
+        # 7. 抬起
+        print("抬起到悬停位置")
+        arm.move([grab_pos[0], grab_pos[1], grab_pos[2] + HOVER_HEIGHT], t=MOVE_TIME, wait=True)
+
+        # 8. 安全位过渡（避免路径横甩）
+        if not args.no_safe:
+            print("经过安全位过渡")
+            arm.move(SAFE_POS, t=MOVE_TIME, wait=True)
+
+        # ========== 放置流程 ==========
+
+        # 9. 避障：如果需要绕行到放置位置
+        if not args.no_avoid and obstacles:
+            current_pos = SAFE_POS if not args.no_safe else [grab_pos[0], grab_pos[1], SAFE_HEIGHT]
+            place_hover = [place_pos[0], place_pos[1], SAFE_HEIGHT]
+
+            if need_detour(current_pos, place_hover, obstacles):
+                print("[避障] 检测到障碍物，计算绕行路径")
+                detour_point = calculate_detour_point(current_pos, place_hover, obstacles)
+                print(f"[避障] 绕行点: {detour_point}")
+                arm.move(detour_point, t=MOVE_TIME, wait=True)
+
+        # 10. 移动到放置位置上方（悬停）
+        print(f"移动到放置位置上方 ({place_pos[0]}, {place_pos[1]}, {place_pos[2] + HOVER_HEIGHT})")
+        arm.move([place_pos[0], place_pos[1], place_pos[2] + HOVER_HEIGHT], t=MOVE_TIME, wait=True)
+
+        # 11. 下降到放置位置
+        print(f"下降到放置位置 ({place_pos[0]}, {place_pos[1]}, {place_pos[2]})")
+        arm.move(place_pos, t=MOVE_TIME, wait=True)
+        time.sleep(0.3)
+
+        # 12. 松开
+        print("打开夹爪")
+        arm.gripper_open(degrees=25, t=GRIPPER_TIME)
+        time.sleep(0.3)
+
+        # 13. 抬起
+        print("抬起到悬停位置")
+        arm.move([place_pos[0], place_pos[1], place_pos[2] + HOVER_HEIGHT], t=MOVE_TIME, wait=True)
+
+        # 14. 回到安全位（避免下次操作路径横甩）
+        if not args.no_safe:
+            print("回到安全位")
+            arm.move(SAFE_POS, t=MOVE_TIME, wait=True)
+
+        # 输出结果
+        result = {
+            "success": True,
+            "object": args.obj,
+            "label": label,
+            "grab_position": {"x": grab_pos[0], "y": grab_pos[1], "z": grab_pos[2]},
+            "place_position": {"x": place_pos[0], "y": place_pos[1], "z": place_pos[2]},
+            "obstacles_count": len(obstacles),
+            "avoid_enabled": not args.no_avoid,
+            "safe_enabled": not args.no_safe
+        }
+
+        if args.json:
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+        else:
+            print("\n结果: 抓取放置完成")
+
+    except Exception as e:
+        print(json.dumps({"success": False, "error": str(e)}, ensure_ascii=False))
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -11,6 +11,7 @@
 用法：
   python 05_grab_avoid.py --target shutiao
   python 05_grab_avoid.py --target cola --place 100,50,-31
+  python 05_grab_avoid.py --target hanbao --no-avoid  # 关闭避障（更快）
 """
 
 import sys
@@ -107,7 +108,6 @@ def detect_objects():
     # 坐标转换
     objects = []
     for det in detections:
-        cmd = [PYTHON_PATH, COORD_SCRIPT, "--px", str(det['cx']), "--py", str(det['cy']), "--json"]
         coord_result = run_script(COORD_SCRIPT, ["--px", str(det['cx']), "--py", str(det['cy']), "--json"])
 
         if coord_result and 'arm_target' in coord_result:
@@ -127,17 +127,6 @@ def detect_objects():
     return objects
 
 
-def pixel_to_arm(px, py):
-    """像素坐标转机械臂坐标"""
-    result = run_script(COORD_SCRIPT, ["--px", str(px), "--py", str(py), "--json"])
-
-    if result and 'arm_target' in result:
-        arm = result['arm_target']
-        return arm['x'], arm['y'], arm['z']
-
-    return None, None, None
-
-
 # ==================== 主函数 ====================
 
 def main():
@@ -147,6 +136,8 @@ def main():
                         help='目标物品类别（cola/hanbao/shutiao/panzi）')
     parser.add_argument('--place', type=str, default='',
                         help='放置位置 x,y,z（可选，默认使用预设位置）')
+    parser.add_argument('--no-avoid', action='store_true',
+                        help='关闭避障功能（更快）')
     parser.add_argument('--json', action='store_true',
                         help='JSON格式输出')
 
@@ -225,6 +216,9 @@ def main():
     if obstacles_str:
         cmd.extend(["--obstacles", obstacles_str])
 
+    if args.no_avoid:
+        cmd.append("--no-avoid")
+
     result = subprocess.run(cmd, capture_output=False, text=True)
 
     # 输出结果
@@ -235,6 +229,7 @@ def main():
             "grab_position": grab_pos,
             "place_position": place_pos,
             "obstacles_count": len(obstacles),
+            "avoid_enabled": not args.no_avoid,
             "status": "ok"
         }
         print(json.dumps(output, ensure_ascii=False, indent=2))
