@@ -1,12 +1,12 @@
 ---
 name: furniture-organize
-description: 家具整理：视觉识别桌面物品，按优先级分类抓取，路径规划避障，放置到指定区域。当用户提到整理桌子、收拾东西、分类物品、整理家具时使用。
+description: 家具整理：视觉识别桌面物品，按优先级分类抓取，路径规划避障，放置到指定区域。当用户提到整理桌子、收拾东西、分类物品、整理家具、夹取汉堡、夹取可乐、夹取薯条时使用。
 allowed-tools: [exec]
 ---
 
 # furniture-organize
 
-桌面物品整理技能：自动识别、优先级排序、路径规划、抓取放置。
+桌面物品整理技能：自动识别、优先级排序、路径规划、避障抓取放置。
 
 ## 脚本目录
 
@@ -27,19 +27,19 @@ allowed-tools: [exec]
 ```json
 {
   "objects": [
-    {"class": "cola", "label": "可乐", "cx": 240.0, "cy": 185.0, "priority": 3, "rank": 1},
-    {"class": "hanbao", "label": "汉堡", "cx": 320.0, "cy": 200.0, "priority": 2, "rank": 2},
-    {"class": "shutiao", "label": "薯条", "cx": 180.0, "cy": 150.0, "priority": 1, "rank": 3}
+    {"class": "cola", "label": "可乐", "cx": 240.0, "cy": 185.0, "arm_x": 170.0, "arm_y": 70.0, "priority": 40.0, "rank": 1},
+    {"class": "hanbao", "label": "汉堡", "cx": 320.0, "cy": 200.0, "arm_x": 163.0, "arm_y": 53.0, "priority": 30.0, "rank": 2},
+    {"class": "shutiao", "label": "薯条", "cx": 180.0, "cy": 150.0, "arm_x": 130.0, "arm_y": 25.0, "priority": 10.0, "rank": 3}
   ],
   "count": 3,
   "status": "ok"
 }
 ```
 
-### 02_plan_path.py — 路径规划（只读）
+### 02_plan_path.py — 路径规划（备用模块）
 
 ```bash
-/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/furniture-organize/scripts/02_plan_path.py --start 150,0,80 --end 215,70,-31
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/furniture-organize/scripts/02_plan_path.py --start 150,0,80 --end 163,53,-31
 ```
 
 参数：
@@ -47,44 +47,38 @@ allowed-tools: [exec]
 - `--end x,y,z`：终点坐标（机械臂坐标）
 - `--obstacles x1,y1,z1,r1;x2,y2,z2,r2`：障碍物列表（可选）
 
-输出示例：
-```json
-{
-  "path": [
-    {"action": "move", "position": [150, 0, 80], "comment": "当前位置"},
-    {"action": "move", "position": [215, 70, 80], "comment": "移动到目标上方"},
-    {"action": "move", "position": [215, 70, -31], "comment": "下降到目标位置"}
-  ],
-  "step_count": 3,
-  "has_obstacle": false,
-  "status": "ok"
-}
-```
+说明：此模块为备用模块，当前版本的避障逻辑已集成到 03_grab_and_place.py 中。
 
-### 03_grab_and_place.py — 抓取放置执行（写操作）
+### 03_grab_and_place.py — 抓取放置执行（写操作，v3.0 重构版）
 
 ```bash
-/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/furniture-organize/scripts/03_grab_and_place.py --obj cola --place 100,50,-31
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/furniture-organize/scripts/03_grab_and_place.py --obj hanbao --grab-pos 163,53,-31 --place 100,0,-31
 ```
 
 参数：
-- `--obj class_name`：物品类别（cola/hanbao/shutiao）
+- `--obj class_name`：物品类别（cola/hanbao/shutiao/panzi）
+- `--grab-pos x,y,z`：抓取位置坐标（机械臂坐标）
 - `--place x,y,z`：放置位置坐标（机械臂坐标）
-- `--grab-pos x,y,z`：抓取位置坐标（可选，默认从视觉获取）
+- `--obstacles x1,y1,z1,r1;x2,y2,z2,r2`：障碍物列表（可选，半径50mm）
+- `--no-avoid`：关闭避障功能（更快）
+- `--no-safe`：不经过安全位（直接路径）
+- `--json`：JSON格式输出
 
 输出示例：
 ```json
 {
-  "object": "cola",
-  "label": "可乐",
-  "grab_position": {"x": 215.0, "y": 69.9, "z": -31.2},
-  "place_position": {"x": 100.0, "y": 50.0, "z": -31.2},
-  "path_steps": 7,
-  "status": "ok"
+  "success": true,
+  "object": "hanbao",
+  "label": "汉堡",
+  "grab_position": {"x": 163.0, "y": 53.0, "z": -31.0},
+  "place_position": {"x": 100.0, "y": 0.0, "z": -31.0},
+  "obstacles_count": 1,
+  "avoid_enabled": true,
+  "safe_enabled": true
 }
 ```
 
-### 04_run_organize.py — 主流程（写操作）
+### 04_run_organize.py — 批量整理主流程（写操作）
 
 ```bash
 /usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/furniture-organize/scripts/04_run_organize.py
@@ -92,9 +86,9 @@ allowed-tools: [exec]
 
 参数：
 - `--dry-run`：只规划不执行（调试用）
-- `--place-zone x,y,width,height`：放置区域（可选）
+- `--json`：JSON格式输出
 
-用途：完整的整理流程：检测 → 排序 → 规划 → 抓取 → 放置
+用途：完整的整理流程：检测 → 排序 → 规划 → 抓取 → 放置（按优先级顺序）
 
 输出示例：
 ```json
@@ -103,41 +97,100 @@ allowed-tools: [exec]
   "success_count": 3,
   "fail_count": 0,
   "details": [
-    {"object": "cola", "status": "ok"},
-    {"object": "hanbao", "status": "ok"},
-    {"object": "shutiao", "status": "ok"}
+    {"object": "cola", "label": "可乐", "status": "ok"},
+    {"object": "hanbao", "label": "汉堡", "status": "ok"},
+    {"object": "shutiao", "label": "薯条", "status": "ok"}
   ],
+  "status": "ok"
+}
+```
+
+### 05_grab_avoid.py — 智能抓取（自动避障，v3.0 新增）
+
+```bash
+/usr/local/miniconda3/bin/python /home/HwHiAiUser/.openclaw/workspace/skills/furniture-organize/scripts/05_grab_avoid.py --target hanbao
+```
+
+参数：
+- `--target class_name`：目标物品类别（cola/hanbao/shutiao/panzi）
+- `--place x,y,z`：放置位置坐标（可选，默认使用放置区域）
+- `--no-avoid`：关闭避障功能（更快）
+- `--json`：JSON格式输出
+
+用途：智能抓取单个物品，自动识别其他物品作为障碍物并避障
+
+输出示例：
+```json
+{
+  "target": "hanbao",
+  "target_label": "汉堡",
+  "grab_position": [163.0, 53.0, -31.2],
+  "place_position": [86.7, -15.0, -31.2],
+  "obstacles_count": 2,
+  "avoid_enabled": true,
   "status": "ok"
 }
 ```
 
 ## 优先级规则
 
-| 优先级 | 物品 | 说明 |
-|--------|------|------|
-| 3（最高） | 可乐 | 饮料先放，防止倾倒 |
-| 2 | 汉堡 | 主食其次 |
-| 1（最低） | 薯条 | 配餐最后 |
+| 优先级 | 物品 | 分数 | 说明 |
+|--------|------|------|------|
+| 1（最高） | 可乐 | 40 | 饮料先放，防止倾倒 |
+| 2 | 汉堡 | 30 | 主食其次 |
+| 3 | 盘子 | 20 | 餐具 |
+| 4（最低） | 薯条 | 10 | 配餐最后 |
 
 同类型物品按距离中心远近排序，近的先抓。
 
-## 放置区域默认配置
+## 放置区域配置（v3.0 更新）
 
-| 物品 | 放置位置（机械臂坐标） |
-|------|------------------------|
-| 可乐 | (100, 50, -31.2) |
-| 汉堡 | (100, 0, -31.2) |
-| 薯条 | (100, -50, -31.2) |
+放置区域：(80, -30) 到 (120, 30)
+
+```
+y=30  ┌─────┬─────┬─────┐
+      │  0  │  1  │  2  │
+y=0   ├─────┼─────┼─────┤
+      │  3  │  4  │  5  │
+y=-30 └─────┴─────┴─────┘
+      x=80  x=100 x=120
+```
+
+物品按优先级依次放在这些位置：
+- 第1个物品 → 位置0 (86.7, -15.0)
+- 第2个物品 → 位置1 (100.0, -15.0)
+- 第3个物品 → 位置2 (113.3, -15.0)
+- 第4个物品 → 位置3 (86.7, 15.0)
+- 第5个物品 → 位置4 (100.0, 15.0)
+- 第6个物品 → 位置5 (113.3, 15.0)
+
+## 避障配置（v3.0 更新）
+
+- **障碍物半径**：50mm（统一，避障效果更明显）
+- **最小安全距离**：50mm
+- **安全高度**：80mm
 
 ## 路径规划说明
 
-1. **安全高度**：所有水平移动在 80mm 高度进行
-2. **避障策略**：检测到障碍物时绕行
-3. **运动顺序**：抬升 → 水平移动 → 下降
+1. **转向**：机械臂先转向目标方向（atan2计算）
+2. **避障**：检测到障碍物时绕行（半径50mm）
+3. **悬停**：移动到目标上方25mm悬停
+4. **下降**：下降到目标位置
+5. **安全位**：抓取/放置后经过安全位过渡
 
 ## 使用规则
 
-1. 执行前先调用 `01_detect_and_sort.py` 确认物品数量
-2. 可通过 `--place-zone` 自定义放置区域
-3. 调试时使用 `--dry-run` 参数
-4. 依赖 `vision-detect` 和 `coord-transform` skill
+1. **批量整理**：使用 `04_run_organize.py`，按优先级整理所有物品
+2. **智能抓取**：使用 `05_grab_avoid.py --target xxx`，抓取指定物品并避障
+3. **调试模式**：使用 `--dry-run` 参数只规划不执行
+4. **依赖**：vision-detect（YOLO检测）、coord-transform（坐标转换）、arm-basic（机械臂控制）
+
+## 飞书指令示例
+
+| 用户指令 | 系统响应 |
+|---------|---------|
+| 整理桌子 | 调用 04_run_organize.py，批量整理所有物品 |
+| 夹取汉堡 | 调用 05_grab_avoid.py --target hanbao |
+| 夹取可乐 | 调用 05_grab_avoid.py --target cola |
+| 夹取薯条 | 调用 05_grab_avoid.py --target shutiao |
+| 看看桌上有什么 | 调用 01_detect_and_sort.py，只检测不抓取 |
