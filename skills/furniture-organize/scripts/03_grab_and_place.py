@@ -10,8 +10,8 @@
   # 基础用法
   python 03_grab_and_place.py --obj hanbao --grab-pos 163,53,-31 --place 100,0,-31
 
-  # 带障碍物
-  python 03_grab_and_place.py --obj hanbao --grab-pos 163,53,-31 --place 100,0,-31 --obstacles "130,25,80,30"
+  # 带障碍物（半径50mm）
+  python 03_grab_and_place.py --obj hanbao --grab-pos 163,53,-31 --place 100,0,-31 --obstacles "130,25,80,50"
 
   # 关闭避障（更快）
   python 03_grab_and_place.py --obj hanbao --grab-pos 163,53,-31 --place 100,0,-31 --no-avoid

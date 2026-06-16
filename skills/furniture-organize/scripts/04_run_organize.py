@@ -29,13 +29,39 @@ ARM_HOME_SCRIPT = os.path.join(SKILLS_DIR, "arm-basic/scripts/02_move_home.py")
 # 安全高度（mm）
 SAFE_HEIGHT = 80
 
-# 默认放置区域配置
-DEFAULT_PLACE_ZONES = {
-    'cola': {'x': 100, 'y': 50, 'z': -31.2},
-    'hanbao': {'x': 100, 'y': 0, 'z': -31.2},
-    'shutiao': {'x': 100, 'y': -50, 'z': -31.2},
-    'panzi': {'x': 50, 'y': 0, 'z': -31.2},  # 盘子放在左边
+# 放置区域配置（固定区域，均匀分布）
+PLACE_AREA = {
+    'x_min': 80,    # 左边界
+    'x_max': 120,   # 右边界
+    'y_min': -30,   # 下边界
+    'y_max': 30,    # 上边界
+    'z': -31.2,     # 放置高度
 }
+
+# 网格排列配置
+GRID_COLS = 3  # 每行3个
+GRID_ROWS = 2  # 最多2行
+
+
+def get_place_position(index):
+    """
+    根据索引计算放置位置（均匀分布在区域内）
+
+    参数：
+        index: 物品索引（0, 1, 2, ...）
+
+    返回：
+        [x, y, z] 放置位置
+    """
+    row = index // GRID_COLS
+    col = index % GRID_COLS
+
+    # 计算在区域内的位置
+    x = PLACE_AREA['x_min'] + (PLACE_AREA['x_max'] - PLACE_AREA['x_min']) * (col + 0.5) / GRID_COLS
+    y = PLACE_AREA['y_min'] + (PLACE_AREA['y_max'] - PLACE_AREA['y_min']) * (row + 0.5) / GRID_ROWS
+    z = PLACE_AREA['z']
+
+    return [x, y, z]
 
 # 物品中文名称
 TYPE_LABELS = {
@@ -135,14 +161,8 @@ def move_home():
 class FurnitureOrganizer:
     """家具整理主控制器"""
 
-    def __init__(self, place_zones=None):
-        """
-        初始化
-
-        参数：
-            place_zones: 放置区域配置 dict
-        """
-        self.place_zones = place_zones or DEFAULT_PLACE_ZONES
+    def __init__(self):
+        """初始化"""
         self.results = []
 
     def run(self, dry_run=False):
@@ -195,12 +215,11 @@ class FurnitureOrganizer:
 
             grab_pos = [grab_x, grab_y, grab_z]
 
-            # 3.2 获取放置位置
-            place_zone = self.place_zones.get(obj_class, DEFAULT_PLACE_ZONES.get(obj_class))
-            place_pos = [place_zone['x'], place_zone['y'], place_zone['z']]
+            # 3.2 获取放置位置（使用放置区域，均匀分布）
+            place_pos = get_place_position(i)  # 使用物品索引计算位置
 
             print(f"  抓取位置: {grab_pos}")
-            print(f"  放置位置: {place_pos}")
+            print(f"  放置位置: ({place_pos[0]:.1f}, {place_pos[1]:.1f}, {place_pos[2]})")
 
             if dry_run:
                 print(f"  [DRY RUN] 跳过实际执行")
@@ -273,31 +292,17 @@ def main():
     parser = argparse.ArgumentParser(description='家具整理 - 主流程')
     parser.add_argument('--dry-run', action='store_true',
                         help='只规划不执行（调试用）')
-    parser.add_argument('--place-zone', type=str, default='',
-                        help='自定义放置区域 x,y,width,height')
     parser.add_argument('--json', action='store_true',
                         help='JSON格式输出')
 
     args = parser.parse_args()
 
-    # 解析自定义放置区域
-    place_zones = None
-    if args.place_zone:
-        try:
-            parts = [float(x) for x in args.place_zone.split(',')]
-            x, y = parts[0], parts[1]
-            # 简单实现：所有物品放在同一区域附近
-            place_zones = {
-                'cola': {'x': x, 'y': y + 50, 'z': -31.2},
-                'hanbao': {'x': x, 'y': y, 'z': -31.2},
-                'shutiao': {'x': x, 'y': y - 50, 'z': -31.2},
-            }
-        except ValueError:
-            print(json.dumps({"error": "放置区域格式错误"}, ensure_ascii=False))
-            sys.exit(1)
-
     # 创建整理器
-    organizer = FurnitureOrganizer(place_zones)
+    organizer = FurnitureOrganizer()
+
+    # 显示放置区域信息
+    print(f"放置区域：({PLACE_AREA['x_min']},{PLACE_AREA['y_min']}) 到 ({PLACE_AREA['x_max']},{PLACE_AREA['y_max']})")
+    print(f"网格排列：每行{GRID_COLS}个，最多{GRID_ROWS}行")
 
     # 执行整理
     result = organizer.run(dry_run=args.dry_run)

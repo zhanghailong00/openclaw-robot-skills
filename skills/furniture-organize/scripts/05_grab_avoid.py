@@ -42,13 +42,42 @@ TYPE_LABELS = {
     'panzi': '盘子',
 }
 
-# 默认放置位置
-DEFAULT_PLACE_ZONES = {
-    'cola': {'x': 100, 'y': 50, 'z': -31.2},
-    'hanbao': {'x': 100, 'y': 0, 'z': -31.2},
-    'shutiao': {'x': 100, 'y': -50, 'z': -31.2},
-    'panzi': {'x': 50, 'y': 0, 'z': -31.2},
+# 放置区域配置（固定区域，均匀分布）
+PLACE_AREA = {
+    'x_min': 80,    # 左边界
+    'x_max': 120,   # 右边界
+    'y_min': -30,   # 下边界
+    'y_max': 30,    # 上边界
+    'z': -31.2,     # 放置高度
 }
+
+# 网格排列配置
+GRID_COLS = 3  # 每行3个
+GRID_ROWS = 2  # 最多2行
+
+# 放置位置计数器
+place_counter = 0
+
+
+def get_place_position(index):
+    """
+    根据索引计算放置位置（均匀分布在区域内）
+
+    参数：
+        index: 物品索引（0, 1, 2, ...）
+
+    返回：
+        [x, y, z] 放置位置
+    """
+    row = index // GRID_COLS
+    col = index % GRID_COLS
+
+    # 计算在区域内的位置
+    x = PLACE_AREA['x_min'] + (PLACE_AREA['x_max'] - PLACE_AREA['x_min']) * (col + 0.5) / GRID_COLS
+    y = PLACE_AREA['y_min'] + (PLACE_AREA['y_max'] - PLACE_AREA['y_min']) * (row + 0.5) / GRID_ROWS
+    z = PLACE_AREA['z']
+
+    return [x, y, z]
 
 
 # ==================== 工具函数 ====================
@@ -169,7 +198,7 @@ def main():
             # 其他物品作为障碍物
             obstacles.append({
                 'center': [obj['arm_x'], obj['arm_y'], SAFE_HEIGHT],
-                'radius': 30,  # 默认半径30mm
+                'radius': 50,  # 统一50mm半径，避障效果更明显
                 'label': obj['label']
             })
 
@@ -190,10 +219,11 @@ def main():
     if args.place:
         place_pos = [float(x) for x in args.place.split(',')]
     else:
-        place_zone = DEFAULT_PLACE_ZONES.get(args.target, DEFAULT_PLACE_ZONES['hanbao'])
-        place_pos = [place_zone['x'], place_zone['y'], place_zone['z']]
+        # 使用放置区域，均匀分布
+        place_pos = get_place_position(0)  # 第一个物品
+        print(f"\n放置区域：({PLACE_AREA['x_min']},{PLACE_AREA['y_min']}) 到 ({PLACE_AREA['x_max']},{PLACE_AREA['y_max']})")
 
-    print(f"\n放置位置：({place_pos[0]}, {place_pos[1]}, {place_pos[2]})")
+    print(f"\n放置位置：({place_pos[0]:.1f}, {place_pos[1]:.1f}, {place_pos[2]})")
 
     # 4. 构建障碍物参数
     obstacles_str = ";".join([
