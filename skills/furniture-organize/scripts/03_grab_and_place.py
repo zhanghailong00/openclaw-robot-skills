@@ -261,32 +261,42 @@ def main():
             target_hover = [grab_pos[0], grab_pos[1], SAFE_HEIGHT]
 
             if need_detour(current_pos, target_hover, obstacles):
-                print("[避障] 检测到障碍物，计算绕行路径")
+                print(f"[避障] 当前位置: {current_pos}")
+                print(f"[避障] 目标上方: {target_hover}")
+                print(f"[避障] 检测到障碍物，计算绕行路径")
+
+                # 显示障碍物信息
+                for i, obs in enumerate(obstacles):
+                    print(f"[避障] 障碍物{i+1}: 中心{obs['center']}, 半径{obs['radius']}mm")
+
                 detour_point = calculate_detour_point(current_pos, target_hover, obstacles)
                 print(f"[避障] 绕行点: {detour_point}")
+                print(f"[避障] 开始绕行...")
                 arm.move(detour_point, t=MOVE_TIME, wait=True)
+                print(f"[避障] 绕行完成，当前位置: {detour_point}")
 
         # 4. 移动到抓取位置上方（悬停）
-        print(f"移动到抓取位置上方 ({grab_pos[0]}, {grab_pos[1]}, {grab_pos[2] + HOVER_HEIGHT})")
-        arm.move([grab_pos[0], grab_pos[1], grab_pos[2] + HOVER_HEIGHT], t=MOVE_TIME, wait=True)
+        hover_pos = [grab_pos[0], grab_pos[1], grab_pos[2] + HOVER_HEIGHT]
+        print(f"[轨迹] 移动到抓取位置上方: {hover_pos}")
+        arm.move(hover_pos, t=MOVE_TIME, wait=True)
 
         # 5. 下降到抓取位置
-        print(f"下降到抓取位置 ({grab_pos[0]}, {grab_pos[1]}, {grab_pos[2]})")
+        print(f"[轨迹] 下降到抓取位置: {grab_pos}")
         arm.move(grab_pos, t=MOVE_TIME, wait=True)
         time.sleep(0.3)
 
         # 6. 夹取
-        print("关闭夹爪")
+        print("[动作] 关闭夹爪")
         arm.gripper_close(t=GRIPPER_TIME)
         time.sleep(0.3)
 
         # 7. 抬起
-        print("抬起到悬停位置")
-        arm.move([grab_pos[0], grab_pos[1], grab_pos[2] + HOVER_HEIGHT], t=MOVE_TIME, wait=True)
+        print(f"[轨迹] 抬起到悬停位置: {hover_pos}")
+        arm.move(hover_pos, t=MOVE_TIME, wait=True)
 
         # 8. 安全位过渡（避免路径横甩）
         if not args.no_safe:
-            print("经过安全位过渡")
+            print(f"[轨迹] 经过安全位过渡: {SAFE_POS}")
             arm.move(SAFE_POS, t=MOVE_TIME, wait=True)
 
         # ========== 放置流程 ==========
@@ -297,32 +307,42 @@ def main():
             place_hover = [place_pos[0], place_pos[1], SAFE_HEIGHT]
 
             if need_detour(current_pos, place_hover, obstacles):
-                print("[避障] 检测到障碍物，计算绕行路径")
+                print(f"[避障] 当前位置: {current_pos}")
+                print(f"[避障] 目标上方: {place_hover}")
+                print(f"[避障] 检测到障碍物，计算绕行路径")
+
+                # 显示障碍物信息
+                for i, obs in enumerate(obstacles):
+                    print(f"[避障] 障碍物{i+1}: 中心{obs['center']}, 半径{obs['radius']}mm")
+
                 detour_point = calculate_detour_point(current_pos, place_hover, obstacles)
                 print(f"[避障] 绕行点: {detour_point}")
+                print(f"[避障] 开始绕行...")
                 arm.move(detour_point, t=MOVE_TIME, wait=True)
+                print(f"[避障] 绕行完成，当前位置: {detour_point}")
 
         # 10. 移动到放置位置上方（悬停）
-        print(f"移动到放置位置上方 ({place_pos[0]}, {place_pos[1]}, {place_pos[2] + HOVER_HEIGHT})")
-        arm.move([place_pos[0], place_pos[1], place_pos[2] + HOVER_HEIGHT], t=MOVE_TIME, wait=True)
+        place_hover_pos = [place_pos[0], place_pos[1], place_pos[2] + HOVER_HEIGHT]
+        print(f"[轨迹] 移动到放置位置上方: {place_hover_pos}")
+        arm.move(place_hover_pos, t=MOVE_TIME, wait=True)
 
         # 11. 下降到放置位置
-        print(f"下降到放置位置 ({place_pos[0]}, {place_pos[1]}, {place_pos[2]})")
+        print(f"[轨迹] 下降到放置位置: {place_pos}")
         arm.move(place_pos, t=MOVE_TIME, wait=True)
         time.sleep(0.3)
 
         # 12. 松开
-        print("打开夹爪")
+        print("[动作] 打开夹爪")
         arm.gripper_open(degrees=25, t=GRIPPER_TIME)
         time.sleep(0.3)
 
         # 13. 抬起
-        print("抬起到悬停位置")
-        arm.move([place_pos[0], place_pos[1], place_pos[2] + HOVER_HEIGHT], t=MOVE_TIME, wait=True)
+        print(f"[轨迹] 抬起到悬停位置: {place_hover_pos}")
+        arm.move(place_hover_pos, t=MOVE_TIME, wait=True)
 
         # 14. 回到安全位（避免下次操作路径横甩）
         if not args.no_safe:
-            print("回到安全位")
+            print(f"[轨迹] 回到安全位: {SAFE_POS}")
             arm.move(SAFE_POS, t=MOVE_TIME, wait=True)
 
         # 输出结果
