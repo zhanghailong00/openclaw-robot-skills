@@ -42,26 +42,49 @@ TYPE_LABELS = {
     'panzi': '盘子',
 }
 
-# 放置区域配置（固定区域，均匀分布）
+# 放置区域配置（缩小范围）
 PLACE_AREA = {
-    'x_min': 80,    # 左边界
-    'x_max': 120,   # 右边界
-    'y_min': -30,   # 下边界
-    'y_max': 30,    # 上边界
-    'z': -31.2,     # 放置高度
+    'x_min': 90,    # X左边界
+    'x_max': 145,   # X右边界
+    'y_min': 110,   # Y下边界
+    'y_max': 170,   # Y上边界
+    'z': -31.2      # 放置高度
 }
 
 # 网格排列配置
 GRID_COLS = 3  # 每行3个
 GRID_ROWS = 2  # 最多2行
 
-# 放置位置计数器
-place_counter = 0
+# 已放置位置记录文件路径（放在 skill 目录下）
+PLACED_POSITIONS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "placed_positions.json")
+
+# 已放置位置记录（避免重复放置）
+placed_positions = []
+
+
+def load_placed_positions():
+    """从文件加载已放置位置"""
+    global placed_positions
+    try:
+        if os.path.exists(PLACED_POSITIONS_FILE):
+            with open(PLACED_POSITIONS_FILE, 'r') as f:
+                placed_positions = json.load(f)
+    except:
+        placed_positions = []
+
+
+def save_placed_positions():
+    """保存已放置位置到文件"""
+    try:
+        with open(PLACED_POSITIONS_FILE, 'w') as f:
+            json.dump(placed_positions, f)
+    except:
+        pass
 
 
 def get_place_position(index):
     """
-    根据索引计算放置位置（均匀分布在区域内）
+    根据索引计算放置位置（均匀分布在区域内，避免重复）
 
     参数：
         index: 物品索引（0, 1, 2, ...）
@@ -69,15 +92,46 @@ def get_place_position(index):
     返回：
         [x, y, z] 放置位置
     """
-    row = index // GRID_COLS
-    col = index % GRID_COLS
+    global placed_positions
 
-    # 计算在区域内的位置
-    x = PLACE_AREA['x_min'] + (PLACE_AREA['x_max'] - PLACE_AREA['x_min']) * (col + 0.5) / GRID_COLS
-    y = PLACE_AREA['y_min'] + (PLACE_AREA['y_max'] - PLACE_AREA['y_min']) * (row + 0.5) / GRID_ROWS
-    z = PLACE_AREA['z']
+    # 计算所有可能的位置
+    all_positions = []
+    for row in range(GRID_ROWS):
+        for col in range(GRID_COLS):
+            x = PLACE_AREA['x_min'] + (PLACE_AREA['x_max'] - PLACE_AREA['x_min']) * (col + 0.5) / GRID_COLS
+            y = PLACE_AREA['y_min'] + (PLACE_AREA['y_max'] - PLACE_AREA['y_min']) * (row + 0.5) / GRID_ROWS
+            z = PLACE_AREA['z']
+            all_positions.append([x, y, z])
 
-    return [x, y, z]
+    # 过滤掉已放置的位置
+    available_positions = []
+    for pos in all_positions:
+        is_used = False
+        for placed in placed_positions:
+            # 如果位置距离小于30mm，认为是相同位置
+            distance = math.sqrt((pos[0]-placed[0])**2 + (pos[1]-placed[1])**2)
+            if distance < 30:
+                is_used = True
+                break
+        if not is_used:
+            available_positions.append(pos)
+
+    # 如果有可用位置，返回第一个
+    if available_positions:
+        selected_pos = available_positions[0]
+        placed_positions.append(selected_pos)
+        return selected_pos
+
+    # 如果没有可用位置，返回默认位置（强制放置）
+    default_pos = all_positions[index % len(all_positions)]
+    placed_positions.append(default_pos)
+    return default_pos
+
+
+def reset_placed_positions():
+    """重置已放置位置记录"""
+    global placed_positions
+    placed_positions = []
 
 
 # ==================== 工具函数 ====================
@@ -160,6 +214,9 @@ def detect_objects():
 
 def main():
     """主函数"""
+    # 加载已放置位置记录
+    load_placed_positions()
+
     parser = argparse.ArgumentParser(description='家具整理 - 智能抓取（自动避障）')
     parser.add_argument('--target', type=str, required=True,
                         help='目标物品类别（cola/hanbao/shutiao/panzi）')
@@ -198,7 +255,7 @@ def main():
             # 其他物品作为障碍物
             obstacles.append({
                 'center': [obj['arm_x'], obj['arm_y'], SAFE_HEIGHT],
-                'radius': 50,  # 统一50mm半径，避障效果更明显
+                'radius': 30,  # 障碍物半径30mm
                 'label': obj['label']
             })
 
@@ -250,6 +307,9 @@ def main():
         cmd.append("--no-avoid")
 
     result = subprocess.run(cmd, capture_output=False, text=True)
+
+    # 保存已放置位置到文件
+    save_placed_positions()
 
     # 输出结果
     if args.json:
