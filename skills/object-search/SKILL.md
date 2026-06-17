@@ -108,7 +108,12 @@ allowed-tools: [exec]
 ```python
 # 推倒配置
 MAX_PUSH_COUNT = 5      # 最大推倒次数
-PUSH_DISTANCE = 60      # 推倒距离（mm）
+
+# 推倒参数
+above_height = 100      # 物体上方高度（mm）
+left_distance = 20      # 向左移动距离（mm）
+down_height = 70        # 下降高度（mm）
+right_distance = 80     # 向右推倒距离（mm）
 
 # 目标物品（只有可乐、汉堡、薯条，盘子无法堆叠）
 TARGET_ITEMS = {'cola', 'hanbao', 'shutiao'}
@@ -187,9 +192,10 @@ SAFE_POS = [20, -130, 30] # 安全位坐标
 ## 注意事项
 
 1. **最大推倒次数**：默认5次，避免无限循环
-2. **推倒距离**：默认60mm，可根据方块大小调整
+2. **推倒参数**：上方100mm，左移20mm，下降70mm，右移80mm
 3. **等待时间**：推倒后等待1.5秒，让方块稳定
 4. **目标物品**：可乐、薯条、汉堡，可修改配置
+5. **已放置位置**：保存在 `placed_positions.json` 文件中，避免重复放置
 
 ## 测试方法
 
