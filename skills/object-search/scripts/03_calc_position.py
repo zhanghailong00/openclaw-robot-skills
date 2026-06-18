@@ -27,13 +27,14 @@ TARGET_ITEMS = {'cola', 'hanbao', 'shutiao'}
 # ==================== 工具函数 ====================
 
 def run_script(script_path, args=None):
-    """运行子脚本并解析JSON"""
-    cmd = [PYTHON_PATH, script_path]
+    """运行子脚本并解析JSON（激活 conda base 环境）"""
+    # 构建命令，在 conda base 环境下运行
+    cmd_str = f"source /home/HwHiAiUser/miniconda3/bin/activate base && {PYTHON_PATH} {script_path}"
     if args:
-        cmd.extend(args)
+        cmd_str += " " + " ".join(args)
 
-    print(f"执行命令: {' '.join(cmd)}")
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    print(f"执行命令: {cmd_str}")
+    result = subprocess.run(cmd_str, shell=True, capture_output=True, text=True)
 
     # 解析JSON（处理多行输出）
     stdout = result.stdout.strip()
@@ -144,27 +145,47 @@ def main():
         arm_pos = [150, 0, -31]
         print(f"  默认位置: {arm_pos}")
 
-    # 5. 计算推倒方向的起始位置和结束位置
+    # 5. 计算推倒位置（上方左移下降右移推倒）
     print(f"\n[5] 计算推倒位置:")
 
-    # 推倒距离
-    push_distance = 60  # mm
+    # 推倒参数
+    above_height = 100  # 物体上方高度（mm）
+    left_distance = 20  # 向左移动距离（mm）
+    down_height = 70    # 下降高度（mm）
+    right_distance = 80 # 向右推倒距离（mm）
 
-    # 向右推倒
-    start_pos = [arm_pos[0] - push_distance, arm_pos[1], arm_pos[2]]
-    end_pos = [arm_pos[0] + push_distance, arm_pos[1], arm_pos[2]]
+    print(f"  推倒方式: 上方左移下降右移推倒")
+    print(f"  推倒参数:")
+    print(f"    物体上方高度: {above_height}mm")
+    print(f"    向左移动距离: {left_distance}mm")
+    print(f"    下降高度: {down_height}mm")
+    print(f"    向右推倒距离: {right_distance}mm")
 
-    print(f"  推倒方向: 向右")
-    print(f"  起始位置: ({start_pos[0]:.1f}, {start_pos[1]:.1f}, {start_pos[2]:.1f})")
-    print(f"  结束位置: ({end_pos[0]:.1f}, {end_pos[1]:.1f}, {end_pos[2]:.1f})")
+    # 步骤1：物体上方100mm
+    above_pos = [arm_pos[0], arm_pos[1], arm_pos[2] + above_height]
+    print(f"\n  步骤1 - 物体上方: ({above_pos[0]:.1f}, {above_pos[1]:.1f}, {above_pos[2]:.1f})")
+
+    # 步骤2：水平向左移动20mm（Y轴负方向）
+    left_pos = [arm_pos[0], arm_pos[1] - left_distance, arm_pos[2] + above_height]
+    print(f"  步骤2 - 向左移动: ({left_pos[0]:.1f}, {left_pos[1]:.1f}, {left_pos[2]:.1f})")
+
+    # 步骤3：下降高度70mm
+    down_pos = [arm_pos[0], arm_pos[1] - left_distance, arm_pos[2] + above_height - down_height]
+    print(f"  步骤3 - 下降高度: ({down_pos[0]:.1f}, {down_pos[1]:.1f}, {down_pos[2]:.1f})")
+
+    # 步骤4：向右移动80mm（推倒，Y轴正方向）
+    right_pos = [arm_pos[0], arm_pos[1] - left_distance + right_distance, arm_pos[2] + above_height - down_height]
+    print(f"  步骤4 - 向右推倒: ({right_pos[0]:.1f}, {right_pos[1]:.1f}, {right_pos[2]:.1f})")
 
     # 6. 输出总结
     print(f"\n[6] 总结:")
-    print(f"  物品数量: {count}")
+    print(f"  物品数量: {len(target_detections)}")
     print(f"  像素中心: ({avg_cx:.1f}, {avg_cy:.1f})")
     print(f"  机械臂位置: ({arm_pos[0]:.1f}, {arm_pos[1]:.1f}, {arm_pos[2]:.1f})")
-    print(f"  推倒起始: ({start_pos[0]:.1f}, {start_pos[1]:.1f}, {start_pos[2]:.1f})")
-    print(f"  推倒结束: ({end_pos[0]:.1f}, {end_pos[1]:.1f}, {end_pos[2]:.1f})")
+    print(f"  步骤1 - 物体上方: ({above_pos[0]:.1f}, {above_pos[1]:.1f}, {above_pos[2]:.1f})")
+    print(f"  步骤2 - 向左移动: ({left_pos[0]:.1f}, {left_pos[1]:.1f}, {left_pos[2]:.1f})")
+    print(f"  步骤3 - 下降高度: ({down_pos[0]:.1f}, {down_pos[1]:.1f}, {down_pos[2]:.1f})")
+    print(f"  步骤4 - 向右推倒: ({right_pos[0]:.1f}, {right_pos[1]:.1f}, {right_pos[2]:.1f})")
 
 
 if __name__ == "__main__":

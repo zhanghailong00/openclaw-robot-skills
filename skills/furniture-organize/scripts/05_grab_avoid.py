@@ -137,12 +137,13 @@ def reset_placed_positions():
 # ==================== 工具函数 ====================
 
 def run_script(script_path, args=None):
-    """运行子脚本并解析JSON"""
-    cmd = [PYTHON_PATH, script_path]
+    """运行子脚本并解析JSON（激活 conda base 环境）"""
+    # 构建命令，在 conda base 环境下运行
+    cmd_str = f"source /home/HwHiAiUser/miniconda3/bin/activate base && {PYTHON_PATH} {script_path}"
     if args:
-        cmd.extend(args)
+        cmd_str += " " + " ".join(args)
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd_str, shell=True, capture_output=True, text=True)
 
     # 解析JSON（处理多行输出）
     stdout = result.stdout.strip()
