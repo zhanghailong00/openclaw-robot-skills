@@ -29,13 +29,13 @@ ARM_HOME_SCRIPT = os.path.join(SKILLS_DIR, "arm-basic/scripts/02_move_home.py")
 # 安全高度（mm）
 SAFE_HEIGHT = 80
 
-# 放置区域配置（固定区域，均匀分布）
+# 放置区域配置（根据实测正方形区域）
 PLACE_AREA = {
-    'x_min': 80,    # 左边界
-    'x_max': 120,   # 右边界
-    'y_min': -30,   # 下边界
-    'y_max': 30,    # 上边界
-    'z': -31.2,     # 放置高度
+    'x_min': 90,    # X左边界
+    'x_max': 145,   # X右边界
+    'y_min': 110,   # Y下边界
+    'y_max': 170,   # Y上边界
+    'z': -31.2      # 放置高度
 }
 
 # 网格排列配置
