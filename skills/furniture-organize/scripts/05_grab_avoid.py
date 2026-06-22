@@ -94,6 +94,10 @@ def get_place_position(index):
     """
     global placed_positions
 
+    # 如果 placed_positions 为空，尝试从文件加载
+    if not placed_positions:
+        load_placed_positions()
+
     # 计算所有可能的位置
     all_positions = []
     for row in range(GRID_ROWS):
@@ -120,11 +124,15 @@ def get_place_position(index):
     if available_positions:
         selected_pos = available_positions[0]
         placed_positions.append(selected_pos)
+        # 保存到文件
+        save_placed_positions()
         return selected_pos
 
     # 如果没有可用位置，返回默认位置（强制放置）
     default_pos = all_positions[index % len(all_positions)]
     placed_positions.append(default_pos)
+    # 保存到文件
+    save_placed_positions()
     return default_pos
 
 
