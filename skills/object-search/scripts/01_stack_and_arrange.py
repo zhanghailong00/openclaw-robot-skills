@@ -26,7 +26,7 @@ sys.path.insert(0, "/home/HwHiAiUser/arm_voice_soft/utils_arm")
 from arm4dof import Arm4DoF
 
 # 导入统一配置
-from config import (
+from object_search_config import (
     PYTHON_PATH, DETECT_SCRIPT, COORD_SCRIPT, ARRANGE_SCRIPT,
     SAFE_HEIGHT, SAFE_POS, MAX_PUSH_COUNT, TARGET_ITEMS,
     ABOVE_HEIGHT, LEFT_DISTANCE, DOWN_HEIGHT, RIGHT_DISTANCE

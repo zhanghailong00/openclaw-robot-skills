@@ -12,7 +12,7 @@ import json
 import subprocess
 
 # 导入统一配置
-from config import (
+from object_search_config import (
     PYTHON_PATH, DETECT_SCRIPT, COORD_SCRIPT, TARGET_ITEMS,
     ABOVE_HEIGHT, LEFT_DISTANCE, DOWN_HEIGHT, RIGHT_DISTANCE
 )

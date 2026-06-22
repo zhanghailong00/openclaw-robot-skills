@@ -12,7 +12,7 @@ import json
 import subprocess
 
 # 导入统一配置
-from config import PYTHON_PATH, DETECT_SCRIPT, TARGET_ITEMS
+from object_search_config import PYTHON_PATH, DETECT_SCRIPT, TARGET_ITEMS
 
 # 堆叠判断阈值
 STACK_THRESHOLD = 3  # 检测到的物品数量 < 3 认为是堆叠
