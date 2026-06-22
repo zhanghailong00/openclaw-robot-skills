@@ -25,25 +25,12 @@ sys.path.insert(0, "/home/HwHiAiUser/arm_voice_soft/utils_arm")
 
 from arm4dof import Arm4DoF
 
-# ==================== 配置 ====================
-
-PYTHON_PATH = "/usr/local/miniconda3/bin/python"
-SKILLS_DIR = "/home/HwHiAiUser/.openclaw/workspace/skills"
-
-# 脚本路径
-DETECT_SCRIPT = os.path.join(SKILLS_DIR, "vision-detect/scripts/02_run_detection.py")
-COORD_SCRIPT = os.path.join(SKILLS_DIR, "coord-transform/scripts/02_convert.py")
-ARRANGE_SCRIPT = os.path.join(SKILLS_DIR, "furniture-organize/scripts/05_grab_avoid.py")
-
-# 安全位置（离开工作区，不遮挡摄像头）
-SAFE_HEIGHT = 30
-SAFE_POS = [20, -130, 30]
-
-# 推倒配置
-MAX_PUSH_COUNT = 5  # 最大推倒次数
-
-# 目标物品（只有可乐、汉堡、薯条，盘子无法堆叠）
-TARGET_ITEMS = {'cola', 'hanbao', 'shutiao'}
+# 导入统一配置
+from config import (
+    PYTHON_PATH, DETECT_SCRIPT, COORD_SCRIPT, ARRANGE_SCRIPT,
+    SAFE_HEIGHT, SAFE_POS, MAX_PUSH_COUNT, TARGET_ITEMS,
+    ABOVE_HEIGHT, LEFT_DISTANCE, DOWN_HEIGHT, RIGHT_DISTANCE
+)
 
 
 # ==================== 工具函数 ====================
@@ -117,11 +104,11 @@ def push_over_stack(arm, stack_pos):
         arm: 机械臂对象
         stack_pos: 堆叠位置 [x, y, z]
     """
-    # 推倒参数
-    above_height = 100  # 物体上方高度（mm）
-    left_distance = 20  # 向左移动距离（mm）
-    down_height = 70    # 下降高度（mm）（增加20mm，确保能碰到）
-    right_distance = 80 # 向右推倒距离（mm）
+    # 推倒参数（从配置文件读取）
+    above_height = ABOVE_HEIGHT
+    left_distance = LEFT_DISTANCE
+    down_height = DOWN_HEIGHT
+    right_distance = RIGHT_DISTANCE
 
     print(f"  推倒方式: 上方左移下降右移推倒")
 

@@ -11,17 +11,11 @@ import os
 import json
 import subprocess
 
-# ==================== 配置 ====================
-
-PYTHON_PATH = "/usr/local/miniconda3/bin/python"
-SKILLS_DIR = "/home/HwHiAiUser/.openclaw/workspace/skills"
-
-# 脚本路径
-DETECT_SCRIPT = os.path.join(SKILLS_DIR, "vision-detect/scripts/02_run_detection.py")
-COORD_SCRIPT = os.path.join(SKILLS_DIR, "coord-transform/scripts/02_convert.py")
-
-# 目标物品（只有可乐、汉堡、薯条，盘子无法堆叠）
-TARGET_ITEMS = {'cola', 'hanbao', 'shutiao'}
+# 导入统一配置
+from config import (
+    PYTHON_PATH, DETECT_SCRIPT, COORD_SCRIPT, TARGET_ITEMS,
+    ABOVE_HEIGHT, LEFT_DISTANCE, DOWN_HEIGHT, RIGHT_DISTANCE
+)
 
 
 # ==================== 工具函数 ====================
@@ -147,11 +141,11 @@ def main():
     # 5. 计算推倒位置（上方左移下降右移推倒）
     print(f"\n[5] 计算推倒位置:")
 
-    # 推倒参数
-    above_height = 100  # 物体上方高度（mm）
-    left_distance = 20  # 向左移动距离（mm）
-    down_height = 70    # 下降高度（mm）
-    right_distance = 80 # 向右推倒距离（mm）
+    # 推倒参数（从配置文件读取）
+    above_height = ABOVE_HEIGHT
+    left_distance = LEFT_DISTANCE
+    down_height = DOWN_HEIGHT
+    right_distance = RIGHT_DISTANCE
 
     print(f"  推倒方式: 上方左移下降右移推倒")
     print(f"  推倒参数:")

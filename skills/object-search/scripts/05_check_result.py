@@ -11,17 +11,8 @@ import os
 import json
 import subprocess
 
-# ==================== 配置 ====================
-
-PYTHON_PATH = "/usr/local/miniconda3/bin/python"
-SKILLS_DIR = "/home/HwHiAiUser/.openclaw/workspace/skills"
-
-# 脚本路径
-DETECT_SCRIPT = os.path.join(SKILLS_DIR, "vision-detect/scripts/02_run_detection.py")
-COORD_SCRIPT = os.path.join(SKILLS_DIR, "coord-transform/scripts/02_convert.py")
-
-# 目标物品（只有可乐、汉堡、薯条，盘子无法堆叠）
-TARGET_ITEMS = {'cola', 'hanbao', 'shutiao'}
+# 导入统一配置
+from config import PYTHON_PATH, DETECT_SCRIPT, COORD_SCRIPT, TARGET_ITEMS
 
 
 # ==================== 工具函数 ====================

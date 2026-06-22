@@ -11,16 +11,8 @@ import os
 import json
 import subprocess
 
-# ==================== 配置 ====================
-
-PYTHON_PATH = "/usr/local/miniconda3/bin/python"
-SKILLS_DIR = "/home/HwHiAiUser/.openclaw/workspace/skills"
-
-# 视觉检测脚本路径
-DETECT_SCRIPT = os.path.join(SKILLS_DIR, "vision-detect/scripts/02_run_detection.py")
-
-# 目标物品（只有可乐、汉堡、薯条，盘子无法堆叠）
-TARGET_ITEMS = {'cola', 'hanbao', 'shutiao'}
+# 导入统一配置
+from config import PYTHON_PATH, DETECT_SCRIPT, TARGET_ITEMS
 
 # 堆叠判断阈值
 STACK_THRESHOLD = 3  # 检测到的物品数量 < 3 认为是堆叠
