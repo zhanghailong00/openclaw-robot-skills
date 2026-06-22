@@ -42,18 +42,18 @@ TYPE_LABELS = {
     'panzi': '盘子',
 }
 
-# 放置区域配置（缩小范围）
+# 放置区域配置（根据实测物品位置）
 PLACE_AREA = {
-    'x_min': 90,    # X左边界
-    'x_max': 145,   # X右边界
-    'y_min': 110,   # Y下边界
-    'y_max': 170,   # Y上边界
+    'x_min': 78,    # X左边界
+    'x_max': 183,   # X右边界
+    'y_min': 10,    # Y下边界
+    'y_max': 96,    # Y上边界
     'z': -31.2      # 放置高度
 }
 
 # 网格排列配置
-GRID_COLS = 3  # 每行3个
-GRID_ROWS = 2  # 最多2行
+GRID_COLS = 2  # 每行2个（增大间距）
+GRID_ROWS = 3  # 最多3行
 
 # 已放置位置记录文件路径（放在 skill 目录下）
 PLACED_POSITIONS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "placed_positions.json")

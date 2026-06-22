@@ -29,18 +29,18 @@ ARM_HOME_SCRIPT = os.path.join(SKILLS_DIR, "arm-basic/scripts/02_move_home.py")
 # 安全高度（mm）
 SAFE_HEIGHT = 80
 
-# 放置区域配置（根据实测正方形区域）
+# 放置区域配置（根据实测物品位置）
 PLACE_AREA = {
-    'x_min': 90,    # X左边界
-    'x_max': 145,   # X右边界
-    'y_min': 110,   # Y下边界
-    'y_max': 170,   # Y上边界
+    'x_min': 78,    # X左边界
+    'x_max': 183,   # X右边界
+    'y_min': 10,    # Y下边界
+    'y_max': 96,    # Y上边界
     'z': -31.2      # 放置高度
 }
 
 # 网格排列配置
-GRID_COLS = 3  # 每行3个
-GRID_ROWS = 2  # 最多2行
+GRID_COLS = 2  # 每行2个（增大间距）
+GRID_ROWS = 3  # 最多3行
 
 
 def get_place_position(index):
