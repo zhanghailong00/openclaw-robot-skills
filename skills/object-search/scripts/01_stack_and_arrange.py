@@ -145,6 +145,12 @@ def main():
     print("堆叠方块整理")
     print("=" * 60)
 
+    # 清空已放置位置记录（开始新的整理任务）
+    from object_search_config import PLACED_POSITIONS_FILE
+    if os.path.exists(PLACED_POSITIONS_FILE):
+        os.remove(PLACED_POSITIONS_FILE)
+        print("已清空放置位置记录")
+
     # 初始化机械臂
     try:
         arm = Arm4DoF(device="/dev/ttyUSB1", is_init_pose=False)

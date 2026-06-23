@@ -75,3 +75,5 @@ MIN_SAFE_DISTANCE = 50
 
 # 已放置位置记录文件路径
 PLACED_POSITIONS_FILE = f"{SKILLS_DIR}/furniture-organize/scripts/placed_positions.json"
+
+        
